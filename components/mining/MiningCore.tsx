@@ -1,6 +1,7 @@
 type MiningCoreProps = {
   balance: number;
   miningRate: number;
+  isMining?: boolean;
 };
 
 export default function MiningCore({

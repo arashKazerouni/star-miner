@@ -1,9 +1,11 @@
+"use client"
 import BottomNav from "@/components/navigation/BottomNav";
 import WithdrawalCard from "@/components/withdrawal/WithdrawalCard";
+import { useUser } from "@/context/UserContext";
 import { WITHDRAWAL_THRESHOLD } from "@/lib/withdrawal";
 
 export default function WithdrawPage() {
-  const balance = 0.00012;
+  const {currentBalance}=useUser()
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-10 pb-24 text-zinc-100">
@@ -18,11 +20,10 @@ export default function WithdrawPage() {
 
         <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500">
           Withdraw your STAR rewards once you reach
-          the minimum balance.
         </p>
 
         <WithdrawalCard
-          balance={balance}
+          balance={currentBalance}
           threshold={WITHDRAWAL_THRESHOLD}
         />
       </div>
