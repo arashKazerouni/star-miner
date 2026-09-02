@@ -27,14 +27,13 @@ export function UserProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User>({
-    id: 'demo-id',
-    balance: 0.000013,
-    referrals: 3,
-    miningRate: 0.000004,
-    lastMiningUpdate: Date.now(),
-  });
-
+  const [user, setUser] = useState<User>(() => ({
+  id: "demo-id",
+  balance: 0.000013,
+  referrals: 3,
+  miningRate: 0.000004,
+  lastMiningUpdate: Date.now(),
+}));
   const [currentBalance, setCurrentBalance] = useState(
     user.balance
   );
