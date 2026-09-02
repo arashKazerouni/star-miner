@@ -2,8 +2,10 @@
 
 import { FormEvent, useState } from 'react'
 import { createClient } from "@/lib/supabase/client"
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -22,13 +24,16 @@ export default function LoginPage() {
       password,
     })
 
+   
+
     if (error) {
       setError(error.message)
       setLoading(false)
       return
     }
 
-    setLoading(false)
+    router.push('/')
+    // router.refresh()
   }
 
   return (
