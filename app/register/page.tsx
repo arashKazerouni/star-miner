@@ -15,6 +15,11 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
+    const referralCode = new URLSearchParams(window.location.search).get("ref");
+    if (referralCode) {
+      localStorage.setItem("star-miner-referral", referralCode);
+    }
+
     const supabase = createClient();
 
     const { error } = await supabase.auth.signUp({
