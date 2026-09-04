@@ -14,10 +14,8 @@ export default function MiningDashboard() {
 
   async function handleLogout() {
     setLoggingOut(true);
-
     const supabase = createClient();
     await supabase.auth.signOut();
-
     router.replace("/login");
     router.refresh();
   }
@@ -27,7 +25,7 @@ export default function MiningDashboard() {
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center">
         <header className="mb-16 flex items-center justify-between">
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
-            Star Miner
+            XLM Farm
           </p>
 
           <button
@@ -40,12 +38,8 @@ export default function MiningDashboard() {
           </button>
         </header>
 
-        <MiningCore
-          balance={currentBalance}
-          miningRate={user.miningRate}
-        />
+        <MiningCore balance={currentBalance} miningRate={user.miningRate} />
       </div>
-
       <BottomNav />
     </main>
   );
