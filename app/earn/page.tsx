@@ -26,47 +26,45 @@ export default function EarnPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-5 py-10 pb-28 text-zinc-100">
+    <main className="min-h-screen bg-[#09090D] px-5 py-10 pb-28 text-white">
       <div className="mx-auto max-w-md">
-        <div className="rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-950 p-6 shadow-2xl shadow-black/30">
-          <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">Earn XLM</p>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight">Grow your farm</h1>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">
-            Invite friends, increase your mining power, and earn more Stellar rewards together.
+        <section className="relative overflow-hidden rounded-3xl border border-[#22222D] bg-[#121217] p-6 shadow-2xl">
+          <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[#6C38FF]/20 blur-3xl" />
+          <p className="relative text-xs uppercase tracking-[0.35em] text-slate-500">Earn XLM</p>
+          <h1 className="relative mt-4 text-4xl font-bold tracking-tight">Grow your farm</h1>
+          <p className="relative mt-3 text-sm leading-6 text-slate-400">
+            Invite farmers, increase your mining power, and unlock more Stellar rewards.
           </p>
 
-          <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
-            <p className="text-xs uppercase tracking-widest text-zinc-500">Mining boost</p>
-            <p className="mt-2 text-3xl font-bold">{miningRate} XLM</p>
-            <p className="mt-1 text-xs text-zinc-500">per reward cycle</p>
+          <div className="mt-6 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-5">
+            <p className="text-xs uppercase tracking-widest text-slate-500">Mining boost</p>
+            <p className="mt-2 text-3xl font-bold tabular-nums">{miningRate} XLM</p>
+            <p className="mt-1 text-xs text-[#10B981]">Active reward multiplier</p>
           </div>
-        </div>
+        </section>
 
-        <div className="mt-6 space-y-4">
+        <section className="mt-6 space-y-4">
           <ReferralStats referrals={referrals} miningRate={miningRate} />
           <ReferralProgress referrals={referrals} target={nextTarget} />
-        </div>
+        </section>
 
-        <div className="mt-8 rounded-3xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-xl shadow-black/20">
-          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">Your referral link</p>
-
-          <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-            <code className="block truncate text-xs text-zinc-300">
+        <section className="mt-8 rounded-3xl border border-[#22222D] bg-[#121217] p-5">
+          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Your referral link</p>
+          <div className="mt-4 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-4">
+            <code className="block truncate text-xs text-slate-300">
               {referralLink || "Loading referral link..."}
             </code>
           </div>
-
           <button
             type="button"
             onClick={copyReferralLink}
             disabled={!referralLink}
-            className="mt-4 w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200 disabled:opacity-40"
+            className="mt-4 w-full rounded-xl bg-[#6C38FF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#5A2EE5] disabled:opacity-40"
           >
             {copied ? "Copied!" : "Copy referral link"}
           </button>
-        </div>
+        </section>
       </div>
-
       <BottomNav />
     </main>
   );
