@@ -4,4 +4,5 @@ export type User = {
   referrals: number;
   miningRate: number;
   lastMiningUpdate: number;
+  referralCode: string;
 };
