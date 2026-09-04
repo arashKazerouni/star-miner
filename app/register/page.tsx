@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +28,10 @@ export default function RegisterPage() {
     const referralCode = new URLSearchParams(window.location.search).get("ref");
     if (referralCode) localStorage.setItem("stellar-farm-referral", referralCode);
 
+    // Create the Supabase browser client only when the form is submitted.
+    // This prevents Next.js from evaluating it during static prerendering,
+    // where the public Supabase environment variables may not be available.
+    const supabase = createClient();
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
