@@ -20,7 +20,7 @@ export default function WithdrawalCard({
         <p className="mt-2 font-mono text-3xl">
           {balance.toFixed(6)}
           <span className="ml-2 text-sm text-zinc-500">
-            STAR
+            XLM
           </span>
         </p>
       </div>
@@ -32,7 +32,7 @@ export default function WithdrawalCard({
           </span>
 
           <span className="font-mono">
-            {threshold.toFixed(6)} STAR
+            {threshold.toFixed(6)} XLM
           </span>
         </div>
       </div>
@@ -60,7 +60,7 @@ export default function WithdrawalCard({
           <p className="mt-2 text-sm leading-6 text-zinc-500">
             You need{" "}
             <span className="font-mono text-zinc-300">
-              {remaining.toFixed(6)} STAR
+              {remaining.toFixed(6)} XLM
             </span>{" "}
             more to unlock withdrawals.
           </p>

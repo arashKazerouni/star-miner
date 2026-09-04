@@ -20,7 +20,7 @@ export default function MiningCore({
         </p>
 
         <p className="mt-1 text-xs tracking-[0.2em] text-zinc-500">
-          STAR
+          XLM
         </p>
       </div>
 
@@ -40,7 +40,7 @@ export default function MiningCore({
       </div>
 
       <p className="font-mono text-xs text-zinc-500">
-        +{miningRate.toFixed(6)} STAR / min
+        +{miningRate.toFixed(6)} XLM / min
       </p>
     </section>
   );

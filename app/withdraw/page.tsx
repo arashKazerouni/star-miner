@@ -17,7 +17,7 @@ export default function WithdrawPage() {
         <h1 className="mt-4 text-3xl font-medium">Your rewards</h1>
 
         <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500">
-          Withdraw your STAR rewards once you reach
+          Withdraw your XLM rewards once you reach
         </p>
 
         <WithdrawalCard

@@ -23,7 +23,7 @@ export default function DonatePage() {
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col justify-center">
         <div className="mb-8 text-center">
           <p className="mb-3 text-xs font-medium uppercase tracking-[0.35em] text-zinc-500">
-            Support Star Miner
+            Support Stellar Farm
           </p>
 
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -31,7 +31,8 @@ export default function DonatePage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-zinc-400">
-            We need your help to give this project <span className="font-semibold text-zinc-200">REAL value</span> and
+            We need your help to give this project{" "}
+            <span className="font-semibold text-zinc-200">REAL value</span> and
             continue building it toward its full potential.
           </p>
         </div>
@@ -40,7 +41,7 @@ export default function DonatePage() {
           <div className="overflow-hidden rounded-2xl bg-white p-2">
             <img
               src="/donation-qr.png"
-              alt="Star Miner Stellar donation QR code"
+              alt="Stellar Farm Stellar donation QR code"
               className="block h-auto w-full"
             />
           </div>
@@ -63,16 +64,31 @@ export default function DonatePage() {
             >
               {copied ? (
                 <>
-                  <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 fill-none stroke-current stroke-2">
-                    <path d="m4 10 4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4 fill-none stroke-current stroke-2"
+                  >
+                    <path
+                      d="m4 10 4 4 8-8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                   Copied!
                 </>
               ) : (
                 <>
-                  <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 fill-none stroke-current stroke-2">
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4 fill-none stroke-current stroke-2"
+                  >
                     <rect x="7" y="7" width="9" height="9" rx="1.5" />
-                    <path d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7" strokeLinecap="round" />
+                    <path
+                      d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7"
+                      strokeLinecap="round"
+                    />
                   </svg>
                   Copy Stellar address
                 </>
@@ -82,7 +98,8 @@ export default function DonatePage() {
         </div>
 
         <p className="mt-6 text-center text-xs leading-5 text-zinc-600">
-          Every contribution helps us keep building, improving, and taking Star Miner further.
+          Every contribution helps us keep building, improving, and taking
+          Stellar Farm further.
         </p>
       </div>
     </main>

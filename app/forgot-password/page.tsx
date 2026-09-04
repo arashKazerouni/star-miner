@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
       <div className="mx-auto flex min-h-[90vh] max-w-md flex-col justify-center">
         <div className="mb-10">
           <p className="mb-4 text-xs font-medium uppercase tracking-[0.35em] text-zinc-500">
-            Star Miner
+            Stellar Farm
           </p>
           <h1 className="text-4xl font-bold tracking-tight">Reset password.</h1>
           <p className="mt-4 text-sm text-zinc-400">

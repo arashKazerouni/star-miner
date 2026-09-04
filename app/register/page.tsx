@@ -29,7 +29,7 @@ export default function RegisterPage() {
 
     const referralCode = new URLSearchParams(window.location.search).get("ref");
     if (referralCode) {
-      localStorage.setItem("star-miner-referral", referralCode);
+      localStorage.setItem("stellar-farm-referral", referralCode);
     }
 
     const { error } = await supabase.auth.signUp({
@@ -52,13 +52,13 @@ export default function RegisterPage() {
       <div className="mx-auto flex min-h-[90vh] max-w-md flex-col justify-center">
         <div className="mb-10">
           <p className="mb-4 text-xs font-medium uppercase tracking-[0.35em] text-zinc-500">
-            Star Miner
+            Stellar Farm
           </p>
 
-          <h1 className="text-4xl font-bold tracking-tight">Start mining.</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Start farming.</h1>
 
           <p className="mt-4 text-sm text-zinc-400">
-            Create your account and start earning STAR.
+            Create your account and start earning XLM.
           </p>
         </div>
 

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import type { User } from "@/types";
 import { createClient } from "@/lib/supabase/client";
@@ -28,11 +22,7 @@ const DEMO_USER: User = {
   referralCode: "",
 };
 
-export function UserProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(DEMO_USER);
   const [currentBalance, setCurrentBalance] = useState(DEMO_USER.balance);
 
@@ -53,17 +43,19 @@ export function UserProvider({
         return;
       }
 
-      const referralCode = new URLSearchParams(window.location.search).get("ref");
+      const referralCode = new URLSearchParams(window.location.search).get(
+        "ref",
+      );
       if (referralCode) {
-        localStorage.setItem("star-miner-referral", referralCode);
+        localStorage.setItem("stellar-farm-referral", referralCode);
       }
 
-      const pendingReferral = localStorage.getItem("star-miner-referral");
+      const pendingReferral = localStorage.getItem("stellar-farm-referral");
       if (pendingReferral) {
         await supabase.rpc("claim_referral", {
           referral_code_input: pendingReferral,
         });
-        localStorage.removeItem("star-miner-referral");
+        localStorage.removeItem("stellar-farm-referral");
       }
 
       const { data, error } = await supabase.rpc("sync_mining");
@@ -128,11 +120,10 @@ export function UserProvider({
     if (user.id === DEMO_USER.id) return;
 
     const interval = setInterval(() => {
-      const elapsedSeconds =
-        (Date.now() - user.lastMiningUpdate) / 1000;
+      const elapsedSeconds = (Date.now() - user.lastMiningUpdate) / 1000;
 
       setCurrentBalance(
-        user.balance + calculateMiningReward(user.miningRate, elapsedSeconds)
+        user.balance + calculateMiningReward(user.miningRate, elapsedSeconds),
       );
     }, 250);
 
@@ -141,14 +132,10 @@ export function UserProvider({
 
   const value = useMemo(
     () => ({ user, currentBalance }),
-    [user, currentBalance]
+    [user, currentBalance],
   );
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {
