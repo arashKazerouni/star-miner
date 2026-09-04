@@ -13,6 +13,7 @@ export default function EarnPage() {
   const referrals = user.referrals;
   const miningRate = user.miningRate;
   const nextTarget = getNextReferralTarget(referrals);
+
   const referralLink =
     user.referralCode && typeof window !== "undefined"
       ? `${window.location.origin}/?ref=${user.referralCode}`
@@ -26,24 +27,35 @@ export default function EarnPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-6 py-10 pb-24 text-zinc-100">
-      <div className="mx-auto max-w-md">
-        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Earn</p>
+    <main className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black px-6 py-8 pb-28 text-zinc-100">
+      <div className="mx-auto max-w-md space-y-6">
+        <section className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur-xl">
+          <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">
+            Earn XLM
+          </p>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight">
+            Grow your mining power
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">
+            Invite friends, build your network, and unlock higher Stellar rewards.
+          </p>
 
-        <h1 className="mt-4 text-3xl font-medium">Invite & Earn</h1>
-
-        <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500">
-          Invite friends and increase your mining rate.
-        </p>
+          <div className="mt-6 rounded-2xl border border-zinc-800 bg-black/30 p-4">
+            <p className="text-xs text-zinc-500">Current mining boost</p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              +{miningRate} XLM/min
+            </p>
+          </div>
+        </section>
 
         <ReferralStats referrals={referrals} miningRate={miningRate} />
         <ReferralProgress referrals={referrals} target={nextTarget} />
 
-        <div className="mt-12 rounded-2xl border border-zinc-900 p-5">
+        <section className="rounded-3xl border border-zinc-800 bg-zinc-900/30 p-5 backdrop-blur-xl">
           <p className="text-sm text-zinc-400">Your referral link</p>
 
-          <div className="mt-4 flex items-center justify-between gap-4">
-            <code className="truncate text-xs text-zinc-500">
+          <div className="mt-4 rounded-2xl border border-zinc-800 bg-black/40 p-4">
+            <code className="block truncate text-xs text-zinc-500">
               {referralLink || "Loading referral link..."}
             </code>
 
@@ -51,12 +63,12 @@ export default function EarnPage() {
               type="button"
               onClick={copyReferralLink}
               disabled={!referralLink}
-              className="shrink-0 text-xs text-white disabled:text-zinc-700"
+              className="mt-4 w-full rounded-xl bg-white px-4 py-3 text-sm font-medium text-black transition hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-600"
             >
-              {copied ? "Copied" : "Copy"}
+              {copied ? "Copied ✓" : "Copy Referral Link"}
             </button>
           </div>
-        </div>
+        </section>
       </div>
 
       <BottomNav />
