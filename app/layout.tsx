@@ -3,8 +3,8 @@ import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 
 export const metadata: Metadata = {
-  title: "Star Miner",
-  description: "Star Miner",
+  title: "XLM Farm",
+  description: "XLM Farm",
 };
 
 export default function RootLayout({
