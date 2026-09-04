@@ -2,6 +2,18 @@
 
 :root {
   color-scheme: dark;
+  --bg-canvas: #09090D;
+  --bg-surface-card: #121217;
+  --bg-surface-elevated: #181820;
+  --bg-surface-input: #0F0F14;
+  --border-subtle: #22222D;
+  --border-focus: #6C38FF;
+  --brand-primary: #6C38FF;
+  --brand-primary-hover: #5A2EE5;
+  --accent-green: #10B981;
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
 }
 
 * {
@@ -11,4 +23,16 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: Inter, system-ui, sans-serif;
+  background-image: radial-gradient(circle at 50% 0%, rgba(108, 56, 255, 0.15), transparent 70%);
+}
+
+button {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.98);
 }
