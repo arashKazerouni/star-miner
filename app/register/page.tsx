@@ -1,34 +1,34 @@
-'use client'
+"use client";
 
-import { FormEvent, useState } from 'react'
-import { createClient } from "@/lib/supabase/client"
+import { FormEvent, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleRegister(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
-    const supabase = createClient()
+    const supabase = createClient();
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
-    })
+    });
 
     if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
+      setError(error.message);
+      setLoading(false);
+      return;
     }
 
-    setLoading(false)
+    setLoading(false);
   }
 
   return (
@@ -54,11 +54,11 @@ export default function RegisterPage() {
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? 'Creating...' : 'Create account'}
+          {loading ? "Creating..." : "Create account"}
         </button>
 
         {error && <p>{error}</p>}
       </form>
     </main>
-  )
+  );
 }

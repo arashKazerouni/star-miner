@@ -28,8 +28,7 @@ export default async function Home() {
           </h1>
 
           <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-400">
-            Start mining, build your balance, and grow your Star Miner
-            account.
+            Start mining, build your balance, and grow your Star Miner account.
           </p>
         </div>
 
