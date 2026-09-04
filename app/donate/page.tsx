@@ -9,97 +9,64 @@ export default function DonatePage() {
   const [copied, setCopied] = useState(false);
 
   async function copyAddress() {
-    try {
-      await navigator.clipboard.writeText(STELLAR_ADDRESS);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch {
-      setCopied(false);
-    }
+    await navigator.clipboard.writeText(STELLAR_ADDRESS);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-5 py-10 pb-28 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-zinc-950 px-5 py-10 pb-28 text-zinc-100">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col justify-center">
-        <div className="mb-8 text-center">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.35em] text-zinc-500">
+        <section className="text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl border border-zinc-800 bg-zinc-900 text-2xl shadow-xl">
+            ✦
+          </div>
+
+          <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">
             Support Stellar Farm
           </p>
 
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            It&apos;s just the beginning.
+          <h1 className="mt-4 text-4xl font-bold tracking-tight">
+            Build the future of XLM farming.
           </h1>
 
-          <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-zinc-400">
-            We need your help to give this project{" "}
-            <span className="font-semibold text-zinc-200">REAL value</span> and
-            continue building it toward its full potential.
+          <p className="mt-4 text-sm leading-6 text-zinc-400">
+            Your support helps us improve the ecosystem, create new features,
+            and continue building Stellar Farm.
           </p>
-        </div>
+        </section>
 
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/60 p-4 shadow-2xl shadow-black/20 sm:p-5">
-          <div className="overflow-hidden rounded-2xl bg-white p-2">
+        <section className="mt-8 rounded-[2rem] border border-zinc-800 bg-zinc-900/70 p-5 shadow-2xl shadow-black/30 backdrop-blur">
+          <div className="rounded-3xl bg-white p-3">
             <img
               src="/donation-qr.png"
-              alt="Stellar Farm Stellar donation QR code"
-              className="block h-auto w-full"
+              alt="Stellar Farm donation QR code"
+              className="w-full rounded-2xl"
             />
           </div>
 
-          <div className="mt-5">
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
-              Stellar address
+          <div className="mt-6">
+            <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+              Stellar Wallet
             </p>
 
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
-              <p className="break-all font-mono text-xs leading-5 text-zinc-300">
+            <div className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+              <code className="break-all text-xs leading-5 text-zinc-300">
                 {STELLAR_ADDRESS}
-              </p>
+              </code>
             </div>
 
             <button
-              type="button"
               onClick={copyAddress}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200 active:scale-[0.99]"
+              className="mt-4 w-full rounded-2xl bg-white py-3 text-sm font-bold text-zinc-950 transition hover:bg-zinc-200 active:scale-[0.98]"
             >
-              {copied ? (
-                <>
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 20 20"
-                    className="h-4 w-4 fill-none stroke-current stroke-2"
-                  >
-                    <path
-                      d="m4 10 4 4 8-8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 20 20"
-                    className="h-4 w-4 fill-none stroke-current stroke-2"
-                  >
-                    <rect x="7" y="7" width="9" height="9" rx="1.5" />
-                    <path
-                      d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  Copy Stellar address
-                </>
-              )}
+              {copied ? "✓ Address Copied" : "Copy Stellar Address"}
             </button>
           </div>
-        </div>
+        </section>
 
-        <p className="mt-6 text-center text-xs leading-5 text-zinc-600">
-          Every contribution helps us keep building, improving, and taking
-          Stellar Farm further.
+        <p className="mt-6 text-center text-xs text-zinc-600">
+          Every contribution moves Stellar Farm one step closer to its vision.
         </p>
       </div>
     </main>
