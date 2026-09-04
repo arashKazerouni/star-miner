@@ -8,14 +8,9 @@ export default async function Home({
   searchParams: Promise<{ ref?: string }>;
 }) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    return <MiningDashboard />;
-  }
+  if (user) return <MiningDashboard />;
 
   const { ref } = await searchParams;
   const referralQuery = ref ? `?ref=${encodeURIComponent(ref)}` : "";
@@ -25,32 +20,23 @@ export default async function Home({
       <div className="mx-auto flex min-h-[90vh] max-w-md flex-col justify-center">
         <div className="mb-12">
           <p className="mb-4 text-xs font-medium uppercase tracking-[0.35em] text-zinc-500">
-            Star Miner
+            XLM Farm
           </p>
-
           <h1 className="text-4xl font-bold tracking-tight">
-            Mine your way
+            Farm your way
             <br />
-            to the stars.
+            to Stellar.
           </h1>
-
           <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-400">
-            Start mining, build your balance, and grow your Star Miner account.
+            Start farming XLM, build your balance, and grow your account.
           </p>
         </div>
 
         <div className="space-y-3">
-          <Link
-            href={`/login${referralQuery}`}
-            className="flex w-full items-center justify-center rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200"
-          >
+          <Link href={`/login${referralQuery}`} className="flex w-full items-center justify-center rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-950">
             Log in
           </Link>
-
-          <Link
-            href={`/register${referralQuery}`}
-            className="flex w-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-3.5 text-sm font-semibold text-zinc-100 transition hover:border-zinc-700 hover:bg-zinc-800"
-          >
+          <Link href={`/register${referralQuery}`} className="flex w-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-3.5 text-sm font-semibold">
             Create account
           </Link>
         </div>
