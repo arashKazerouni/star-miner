@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import MiningCore from "@/components/mining/MiningCore";
 import { useUser } from "@/context/UserContext";
 import { createClient } from "@/lib/supabase/client";
@@ -39,15 +40,10 @@ export default function MiningDashboard() {
 
         <div className="grid gap-4 md:grid-cols-3">
           {stats.map(([title, unit]) => (
-            <div
-              key={title}
-              className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-card)] p-5"
-            >
+            <div key={title} className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-card)] p-5">
               <p className="text-sm text-slate-400">{title}</p>
               <p className="mt-3 text-3xl font-bold tabular-nums w-full">
-                {title === "Current Balance"
-                  ? currentBalance.toFixed(4)
-                  : "12.5000"}{" "}
+                {title === "Current Balance" ? currentBalance.toFixed(4) : "12.5000"}{" "}
                 <span className="text-sm text-slate-400">{unit}</span>
               </p>
             </div>
@@ -57,6 +53,15 @@ export default function MiningDashboard() {
         <div className="mt-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-card)] p-6">
           <MiningCore balance={currentBalance} miningRate={user.miningRate} />
         </div>
+
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-400 transition hover:bg-red-500/20 disabled:opacity-50"
+        >
+          <LogOut size={18} />
+          {loggingOut ? "Logging out..." : "Log out"}
+        </button>
       </section>
     </main>
   );
