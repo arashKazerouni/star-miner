@@ -112,7 +112,7 @@ begin
   for update;
 
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
-  reward := profile.mining_rate * elapsed_seconds;
+  reward := profile.mining_rate * (elapsed_seconds / 60);
 
   update public.profiles
   set balance = profile.balance + reward,
