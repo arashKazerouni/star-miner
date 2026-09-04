@@ -1,7 +1,7 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   balance numeric(30,18) not null default 0.000013,
-  referrals integer not null default 0 check (referrals >= 0),
+  referrals integer not null default 0,
   mining_rate numeric(30,18) not null default 0.000001,
   last_mining_update timestamptz not null default now(),
   referral_code text not null unique default upper(substr(md5(gen_random_uuid()::text), 1, 8)),
@@ -15,6 +15,10 @@ create table if not exists public.referrals (
   created_at timestamptz not null default now(),
   check (inviter_id <> invitee_id)
 );
+
+insert into public.profiles (id)
+select id from auth.users
+on conflict (id) do nothing;
 
 alter table public.profiles enable row level security;
 alter table public.referrals enable row level security;
@@ -98,14 +102,14 @@ declare
   elapsed_seconds numeric;
   reward numeric;
 begin
+  insert into public.profiles (id)
+  values (auth.uid())
+  on conflict (id) do nothing;
+
   select * into profile
   from public.profiles
   where id = auth.uid()
   for update;
-
-  if profile.id is null then
-    return;
-  end if;
 
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
   reward := profile.mining_rate * elapsed_seconds;
