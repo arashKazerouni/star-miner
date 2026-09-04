@@ -1,16 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import BottomNav from "@/components/navigation/BottomNav";
 import ReferralStats from "@/components/referrals/ReferralStats";
 import ReferralProgress from "@/components/referrals/ReferralProgress";
-import { calculateMiningRate, getNextReferralTarget } from "@/lib/referrals";
+import { getNextReferralTarget } from "@/lib/referrals";
 
 export default function EarnPage() {
-  const { user, addReferral } = useUser();
+  const { user } = useUser();
+  const [copied, setCopied] = useState(false);
   const referrals = user.referrals;
   const miningRate = user.miningRate;
   const nextTarget = getNextReferralTarget(referrals);
+  const referralLink =
+    user.referralCode && typeof window !== "undefined"
+      ? `${window.location.origin}/?ref=${user.referralCode}`
+      : "";
+
+  async function copyReferralLink() {
+    if (!referralLink) return;
+    await navigator.clipboard.writeText(referralLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-10 pb-24 text-zinc-100">
@@ -24,7 +37,6 @@ export default function EarnPage() {
         </p>
 
         <ReferralStats referrals={referrals} miningRate={miningRate} />
-
         <ReferralProgress referrals={referrals} target={nextTarget} />
 
         <div className="mt-12 rounded-2xl border border-zinc-900 p-5">
@@ -32,19 +44,19 @@ export default function EarnPage() {
 
           <div className="mt-4 flex items-center justify-between gap-4">
             <code className="truncate text-xs text-zinc-500">
-              starminer.app/ref/demo
+              {referralLink || "Loading referral link..."}
             </code>
 
-            <button className="shrink-0 text-xs text-white">Copy</button>
+            <button
+              type="button"
+              onClick={copyReferralLink}
+              disabled={!referralLink}
+              className="shrink-0 text-xs text-white disabled:text-zinc-700"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
           </div>
         </div>
-
-        <button
-          onClick={addReferral}
-          className="mt-4 w-full rounded-2xl bg-white py-4 text-sm font-medium text-black transition hover:bg-zinc-200 active:scale-[0.98]"
-        >
-          Simulate Referral
-        </button>
       </div>
 
       <BottomNav />
