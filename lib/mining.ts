@@ -1,10 +1,10 @@
-export const BASE_MINING_RATE = 0.000001;
+export const BASE_MINING_RATE = 0.002;
 
 export function calculateMiningReward(
   miningRate: number,
   elapsedSeconds: number
 ) {
-  return miningRate * (elapsedSeconds / 60);
+  return miningRate * (elapsedSeconds / 3600);
 }
 
 export function calculateCurrentBalance(
