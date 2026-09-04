@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
+import BottomNav from "@/components/navigation/BottomNav";
 
 export const metadata: Metadata = {
   title: "XLM Farm",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          {children}
+          <BottomNav />
+        </UserProvider>
       </body>
     </html>
   );
