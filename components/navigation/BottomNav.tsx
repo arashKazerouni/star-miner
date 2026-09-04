@@ -8,8 +8,6 @@ const links = [
   { href: "/earn", label: "Earn" },
   { href: "/withdraw", label: "Withdraw" },
   { href: "/donate", label: "Donate" },
-  { href: "/login", label: "Login" },
-  { href: "/register", label: "Register" },
 ];
 
 export default function BottomNav() {
