@@ -9,84 +9,138 @@ import {
 } from "react";
 
 import type { User } from "@/types";
-import {
-  BASE_MINING_RATE,
-  calculateMiningReward,
-} from "@/lib/mining";
+import { createClient } from "@/lib/supabase/client";
+import { calculateMiningReward } from "@/lib/mining";
 
 type UserContextType = {
   user: User;
   currentBalance: number;
-  addReferral: () => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
+
+const DEMO_USER: User = {
+  id: "demo-id",
+  balance: 0,
+  referrals: 0,
+  miningRate: 0.000001,
+  lastMiningUpdate: Date.now(),
+  referralCode: "",
+};
 
 export function UserProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User>(() => ({
-  id: "demo-id",
-  balance: 0.000013,
-  referrals: 3,
-  miningRate: 0.000004,
-  lastMiningUpdate: Date.now(),
-}));
-  const [currentBalance, setCurrentBalance] = useState(
-    user.balance
-  );
+  const [user, setUser] = useState<User>(DEMO_USER);
+  const [currentBalance, setCurrentBalance] = useState(DEMO_USER.balance);
 
   useEffect(() => {
+    const supabase = createClient();
+    let active = true;
+
+    async function loadProfile() {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      if (!authUser) {
+        if (active) {
+          setUser(DEMO_USER);
+          setCurrentBalance(0);
+        }
+        return;
+      }
+
+      const referralCode = new URLSearchParams(window.location.search).get("ref");
+      if (referralCode) {
+        localStorage.setItem("star-miner-referral", referralCode);
+      }
+
+      const pendingReferral = localStorage.getItem("star-miner-referral");
+      if (pendingReferral) {
+        await supabase.rpc("claim_referral", {
+          referral_code_input: pendingReferral,
+        });
+        localStorage.removeItem("star-miner-referral");
+      }
+
+      const { data, error } = await supabase.rpc("sync_mining");
+
+      if (error || !data?.[0] || !active) return;
+
+      const profile = data[0];
+      const nextUser: User = {
+        id: authUser.id,
+        balance: Number(profile.balance),
+        referrals: profile.referrals,
+        miningRate: Number(profile.mining_rate),
+        lastMiningUpdate: new Date(profile.last_mining_update).getTime(),
+        referralCode: profile.referral_code,
+      };
+
+      setUser(nextUser);
+      setCurrentBalance(nextUser.balance);
+    }
+
+    void loadProfile();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      void loadProfile();
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (user.id === DEMO_USER.id) return;
+
+    const supabase = createClient();
+
+    const interval = setInterval(async () => {
+      const { data, error } = await supabase.rpc("sync_mining");
+      if (error || !data?.[0]) return;
+
+      const profile = data[0];
+      const balance = Number(profile.balance);
+      const miningRate = Number(profile.mining_rate);
+      const lastMiningUpdate = new Date(profile.last_mining_update).getTime();
+
+      setUser((current) => ({
+        ...current,
+        balance,
+        referrals: profile.referrals,
+        miningRate,
+        lastMiningUpdate,
+        referralCode: profile.referral_code,
+      }));
+      setCurrentBalance(balance);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [user.id]);
+
+  useEffect(() => {
+    if (user.id === DEMO_USER.id) return;
+
     const interval = setInterval(() => {
       const elapsedSeconds =
         (Date.now() - user.lastMiningUpdate) / 1000;
 
-      const reward = calculateMiningReward(
-        user.miningRate,
-        elapsedSeconds
+      setCurrentBalance(
+        user.balance + calculateMiningReward(user.miningRate, elapsedSeconds)
       );
-
-      setCurrentBalance(user.balance + reward);
-    }, 5000);
+    }, 250);
 
     return () => clearInterval(interval);
-  }, [
-    user.balance,
-    user.miningRate,
-    user.lastMiningUpdate,
-  ]);
-
-  function addReferral() {
-    setUser((current) => {
-      const referrals = current.referrals + 1;
-
-      const currentBalance =
-        current.balance +
-        calculateMiningReward(
-          current.miningRate,
-          (Date.now() - current.lastMiningUpdate) / 1000
-        );
-
-      return {
-        ...current,
-        balance: currentBalance,
-        referrals,
-        miningRate:
-          BASE_MINING_RATE +
-          referrals * BASE_MINING_RATE,
-        lastMiningUpdate: Date.now(),
-      };
-    });
-  }
+  }, [user.id, user.balance, user.miningRate, user.lastMiningUpdate]);
 
   const value = useMemo(
-    () => ({
-      user,
-      currentBalance,
-      addReferral,
-    }),
+    () => ({ user, currentBalance }),
     [user, currentBalance]
   );
 
@@ -101,9 +155,7 @@ export function useUser() {
   const context = useContext(UserContext);
 
   if (!context) {
-    throw new Error(
-      "useUser must be used inside UserProvider"
-    );
+    throw new Error("useUser must be used inside UserProvider");
   }
 
   return context;
