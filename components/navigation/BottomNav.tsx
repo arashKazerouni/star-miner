@@ -7,6 +7,7 @@ const links = [
   { href: "/", label: "Mine" },
   { href: "/earn", label: "Earn" },
   { href: "/withdraw", label: "Withdraw" },
+  { href: "/donate", label: "Donate" },
 ];
 
 export default function BottomNav() {
