@@ -30,23 +30,39 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-6 py-10 text-zinc-100">
-      <div className="mx-auto flex min-h-[90vh] max-w-md flex-col justify-center">
-        <header className="mb-10">
-          <p className="mb-4 text-xs font-medium uppercase tracking-[0.35em] text-zinc-500">XLM Farm</p>
-          <h1 className="text-4xl font-bold tracking-tight">Welcome back.</h1>
-          <p className="mt-4 text-sm text-zinc-400">Continue your farming journey.</p>
-        </header>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#09090D] px-6 text-white">
+      <div className="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(circle_at_50%_0%,rgba(108,56,255,0.15),transparent_70%)]" />
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required placeholder="Email" className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm outline-none" />
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required placeholder="Password" className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm outline-none" />
-          <a href="/forgot-password" className="block text-right text-xs text-zinc-500 hover:text-white">Forgot password?</a>
-          {error && <p className="rounded-xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-400">{error}</p>}
-          <button disabled={loading} className="w-full rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-950">{loading ? "Loading..." : "Log in"}</button>
-        </form>
+      <div className="relative w-full max-w-[440px]">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#6C38FF]/20 text-2xl text-[#A78BFA]">
+            ✦
+          </div>
+          <h1 className="text-[28px] font-bold">XLM Farm</h1>
+          <p className="mt-2 text-sm text-[#94A3B8]">Farm rewards. Grow with Stellar.</p>
+        </div>
 
-        <p className="mt-8 text-center text-sm text-zinc-500">Need an account? <a href="/register" className="text-white">Create one</a></p>
+        <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-6 shadow-xl">
+          <div className="mb-6 flex rounded-lg border border-[#22222D] bg-[#0F0F14] p-1 text-sm">
+            <div className="flex-1 rounded-md bg-[#6C38FF] px-3 py-2 text-center font-medium">Log in</div>
+            <a href="/register" className="flex-1 px-3 py-2 text-center text-[#94A3B8]">Create account</a>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required placeholder="Email address" className="w-full rounded-lg border border-[#22222D] bg-[#0F0F14] px-4 py-3 text-sm outline-none focus:border-[#6C38FF]" />
+            <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required placeholder="Password" className="w-full rounded-lg border border-[#22222D] bg-[#0F0F14] px-4 py-3 text-sm outline-none focus:border-[#6C38FF]" />
+
+            <a href="/forgot-password" className="block text-right text-xs text-[#94A3B8] hover:text-white">Forgot password?</a>
+
+            {error && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">{error}</p>}
+
+            <button disabled={loading} className="w-full rounded-lg bg-[#6C38FF] py-3.5 text-sm font-semibold shadow-[0_4px_20px_rgba(108,56,255,0.35)] transition hover:bg-[#5A2EE5] active:scale-[0.98] disabled:opacity-50">
+              {loading ? "Loading..." : "Log in"}
+            </button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-[#64748B]">Secure access to your Stellar rewards dashboard</p>
       </div>
     </main>
   );
