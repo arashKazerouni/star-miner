@@ -1,19 +1,10 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import MiningDashboard from "@/components/mining/MiningDashboard";
 
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ ref?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) return <MiningDashboard />;
-
   const { ref } = await searchParams;
   const referralQuery = ref ? `?ref=${encodeURIComponent(ref)}` : "";
 
