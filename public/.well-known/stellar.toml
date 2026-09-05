@@ -1,0 +1,24 @@
+NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
+
+VERSION="2.0.0"
+
+[DOCUMENTATION]
+ORG_NAME="Stellar Farm"
+ORG_URL="https://stellarfarm.vercel.app"
+ORG_LOGO="https://stellarfarm.vercel.app/logo.png"
+ORG_DESCRIPTION="Stellar Farm is a yield-focused protocol built on the Stellar network. The platform is designed to provide a transparent environment for users to participate in Stellar-based farming, liquidity and reward mechanisms while keeping activity within the Stellar ecosystem."
+
+[[PRINCIPALS]]
+name="Stellar Farm Admin"
+
+[[CURRENCIES]]
+code="FARM"
+issuer="GBF7ZMNV4L2PFQRHJEMQLH7FEYMIP4ZSUKQ42ZOCYL5MI5P234C2NMNB"
+name="Stellar Farm Token"
+desc="FARM is the native utility and ecosystem token associated with Stellar Farm, a yield-focused application built on the Stellar network. Stellar Farm is designed around XLM-based participation, transparent on-chain activity, and reward mechanisms that encourage long-term ecosystem participation."
+conditions="FARM is a Stellar network asset issued by the account identified by the issuer public key above. The token does not represent ownership of Stellar, Vercel, or any other third-party organization. FARM does not constitute a guaranteed return, deposit, security, share, or promise of profit. Token availability, utility, rewards, farming mechanisms, liquidity, and other protocol features are subject to the rules and technical implementation of Stellar Farm. Users are responsible for evaluating the risks associated with digital assets and blockchain applications before interacting with FARM."
+image="https://stellarfarm.vercel.app/logo.png"
+fixed_number=922337203685
+is_asset_anchored=false
+display_decimals=7
+status="live"
