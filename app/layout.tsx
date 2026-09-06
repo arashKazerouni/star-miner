@@ -4,8 +4,8 @@ import { UserProvider } from "@/context/UserContext";
 import BottomNav from "@/components/navigation/BottomNav";
 
 export const metadata: Metadata = {
-  title: "XLM Farm",
-  description: "XLM Farm",
+  title: "Stellar FARM",
+  description: "Stellar FARM",
 };
 
 export default function RootLayout({

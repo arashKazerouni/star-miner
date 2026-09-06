@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
       <div className="relative mx-auto flex min-h-[90vh] max-w-[440px] flex-col justify-center">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#22222D] bg-[#121217] text-xl font-bold text-[#A78BFA]">X</div>
-          <p className="text-xs font-medium uppercase tracking-[0.35em] text-[#64748B]">XLM Farm</p>
+          <p className="text-xs font-medium uppercase tracking-[0.35em] text-[#64748B]">Stellar FARM</p>
           <h1 className="mt-5 text-[28px] font-bold tracking-tight">Reset password</h1>
           <p className="mt-3 text-sm text-[#94A3B8]">Enter your email and we'll send you a secure reset link.</p>
         </div>
