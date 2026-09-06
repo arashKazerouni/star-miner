@@ -5,14 +5,17 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const price = await fetchFarmXlmPrice();
+    const { farmUsd, xlmUsd, farmXlm } = await fetchFarmXlmPrice();
 
     return NextResponse.json(
       {
         asset: "FARM",
         counter: "XLM",
-        price,
-        source: "Stellar Horizon order book",
+        price: farmXlm,
+        farmUsd,
+        xlmUsd,
+        inversePrice: 1 / farmXlm,
+        source: "Stellar Expert",
         updatedAt: new Date().toISOString(),
       },
       {
@@ -29,7 +32,10 @@ export async function GET() {
         asset: "FARM",
         counter: "XLM",
         price: null,
-        source: "Stellar Horizon order book",
+        farmUsd: null,
+        xlmUsd: null,
+        inversePrice: null,
+        source: "Stellar Expert",
         updatedAt: new Date().toISOString(),
         error: "Live FARM/XLM price is temporarily unavailable.",
       },
