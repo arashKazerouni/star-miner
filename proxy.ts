@@ -11,13 +11,6 @@ export async function proxy(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 
-  // Public pages must remain accessible even when Supabase is not configured.
-  // This also prevents an unavailable/misconfigured auth backend from taking
-  // down the public landing page with a server error.
-  if (pathname === "/") {
-    return NextResponse.next();
-  }
-
   let response = NextResponse.next({
     request,
   });
@@ -25,6 +18,7 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
+  // Keep the public application usable when Supabase is not configured.
   if (!supabaseUrl || !supabaseKey) {
     if (isPublicRoute) return response;
 
@@ -61,6 +55,15 @@ export async function proxy(request: NextRequest) {
   const isAuthRoute = AUTH_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
+
+  // The landing page is public for logged-out visitors, but authenticated
+  // users should always enter the application through the mining dashboard.
+  if (pathname === "/" && claims) {
+    const appUrl = request.nextUrl.clone();
+    appUrl.pathname = "/dashboard";
+    appUrl.search = "";
+    return NextResponse.redirect(appUrl);
+  }
 
   if (!claims && !isPublicRoute) {
     const loginUrl = request.nextUrl.clone();
