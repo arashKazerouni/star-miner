@@ -1,14 +1,20 @@
-export type OrderBook = {
-  bids?: Array<{ price?: string }>;
-  asks?: Array<{ price?: string }>;
-};
-
 export const FARM_ASSET: {
   code: "FARM";
   issuer: string;
 };
 
-export const HORIZON_URL: string;
-export function calculateMidPrice(orderBook: OrderBook | null | undefined): number | null;
-export function buildOrderBookUrl(): string;
-export function fetchFarmXlmPrice(fetchImpl?: typeof fetch): Promise<number>;
+export const XLM_ASSET: "XLM";
+export const STELLAR_EXPERT_URL: string;
+
+export function calculateFarmXlmPrice(
+  farmPrice: unknown,
+  xlmPrice: unknown,
+): number | null;
+
+export function buildAssetUrl(asset: string): string;
+
+export function fetchFarmXlmPrice(fetchImpl?: typeof fetch): Promise<{
+  farmUsd: number;
+  xlmUsd: number;
+  farmXlm: number;
+}>;
