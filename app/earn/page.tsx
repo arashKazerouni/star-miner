@@ -6,8 +6,8 @@ import BottomNav from "@/components/navigation/BottomNav";
 import ReferralStats from "@/components/referrals/ReferralStats";
 import ReferralProgress from "@/components/referrals/ReferralProgress";
 import { getNextReferralTarget } from "@/lib/referrals";
-
-const WITHDRAWAL_THRESHOLD = 0.001;
+import { BASE_MINING_RATE, REFERRAL_MINING_BONUS } from "@/lib/mining";
+import { WITHDRAWAL_THRESHOLD } from "@/lib/withdrawal";
 
 export default function EarnPage() {
   const { user, currentBalance } = useUser();
@@ -24,8 +24,7 @@ export default function EarnPage() {
     [user.referralCode],
   );
 
-  const referralBonus = Math.max(miningRate - 0.0000025, 0);
-  const baseRate = 0.0000025;
+  const referralBonus = Math.max(miningRate - BASE_MINING_RATE, 0);
   const progressToWithdraw = Math.min(
     (currentBalance / WITHDRAWAL_THRESHOLD) * 100,
     100,
@@ -67,7 +66,7 @@ export default function EarnPage() {
               <div className="rounded-2xl border border-[#2B2744] bg-[#19152A] px-3 py-2 text-right">
                 <p className="text-[10px] uppercase tracking-wider text-slate-500">Mining rate</p>
                 <p className="mt-1 font-mono text-sm font-semibold text-[#B9ACFF]">
-                  {miningRate.toFixed(7)} / hr
+                  {miningRate.toFixed(2)} / hr
                 </p>
               </div>
             </div>
@@ -86,7 +85,7 @@ export default function EarnPage() {
               <p className="mt-2 text-xs text-slate-500">
                 {currentBalance >= WITHDRAWAL_THRESHOLD
                   ? "Minimum withdrawal reached."
-                  : `${(WITHDRAWAL_THRESHOLD - currentBalance).toFixed(6)} FARM remaining`}
+                  : `${(WITHDRAWAL_THRESHOLD - currentBalance).toFixed(2)} FARM remaining`}
               </p>
             </div>
           </div>
@@ -100,7 +99,7 @@ export default function EarnPage() {
           </div>
           <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-4">
             <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Referral boost</p>
-            <p className="mt-2 text-2xl font-bold tabular-nums">+{referralBonus.toFixed(7)}</p>
+            <p className="mt-2 text-2xl font-bold tabular-nums">+{referralBonus.toFixed(2)}</p>
             <p className="mt-1 text-xs text-slate-500">FARM / hour</p>
           </div>
         </section>
@@ -112,12 +111,12 @@ export default function EarnPage() {
               <h2 className="mt-2 text-xl font-bold">Every farmer makes you stronger</h2>
             </div>
             <div className="rounded-xl bg-[#1A1728] px-3 py-2 text-center">
-              <p className="text-lg font-bold text-[#B9ACFF]">+20%</p>
-              <p className="text-[9px] uppercase tracking-wider text-slate-500">per referral</p>
+              <p className="text-lg font-bold text-[#B9ACFF]">+{REFERRAL_MINING_BONUS.toFixed(2)}</p>
+              <p className="text-[9px] uppercase tracking-wider text-slate-500">FARM / hour</p>
             </div>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-400">
-            Your base mining rate is {baseRate.toFixed(7)} FARM/hour. Each successful referral adds another 20% of the base rate.
+            Your base mining rate is {BASE_MINING_RATE.toFixed(2)} FARM/hour. Each successful referral adds {REFERRAL_MINING_BONUS.toFixed(2)} FARM/hour.
           </p>
           <div className="mt-5">
             <ReferralStats referrals={referrals} miningRate={miningRate} />
