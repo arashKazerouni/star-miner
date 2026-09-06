@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+
+import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { href: "/", label: "Mine" },
@@ -12,8 +15,42 @@ const links = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  if (pathname === "/") {
+  useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      setIsAuthenticated(false);
+      return;
+    }
+
+    const supabase = createClient();
+    let active = true;
+
+    async function checkAuth() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (active) setIsAuthenticated(Boolean(user));
+    }
+
+    void checkAuth();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, user) => {
+      if (active) setIsAuthenticated(Boolean(user));
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Keep the navigation hidden until authentication has been resolved.
+  if (isAuthenticated !== true) {
     return null;
   }
 
