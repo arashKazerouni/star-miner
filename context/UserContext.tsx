@@ -4,20 +4,18 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import type { User } from "@/types";
 import { createClient } from "@/lib/supabase/client";
-import { calculateMiningReward } from "@/lib/mining";
+import { calculateMiningRate, calculateMiningReward } from "@/lib/mining";
 
 type UserContextType = {
   user: User;
   currentBalance: number;
 };
 
-const UserContext = createContext<UserContextType | null>(null);
-
 const DEMO_USER: User = {
   id: "demo-id",
   balance: 0,
   referrals: 0,
-  miningRate: 0.000001,
+  miningRate: calculateMiningRate(0),
   lastMiningUpdate: Date.now(),
   referralCode: "",
 };
@@ -30,8 +28,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-    // Keep the public application usable when Supabase environment variables
-    // are not configured (for example, during a fresh Vercel deployment).
     if (!supabaseUrl || !supabaseKey) return;
 
     const supabase = createClient();
