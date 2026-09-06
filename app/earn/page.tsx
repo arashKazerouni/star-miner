@@ -8,6 +8,7 @@ import ReferralProgress from "@/components/referrals/ReferralProgress";
 import { getNextReferralTarget } from "@/lib/referrals";
 import { BASE_MINING_RATE, REFERRAL_MINING_BONUS } from "@/lib/mining";
 import { WITHDRAWAL_THRESHOLD } from "@/lib/withdrawal";
+import { FarmLogo } from "@/components/FarmLogo";
 
 export default function EarnPage() {
   const { user, currentBalance } = useUser();
@@ -148,7 +149,7 @@ export default function EarnPage() {
         <section className="mt-5 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-4">
           <div className="flex gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1B1730] text-sm text-[#B9ACFF]">
-              ✦
+              <FarmLogo size={48} />
             </div>
             <div>
               <p className="text-sm font-semibold">Keep mining consistently</p>

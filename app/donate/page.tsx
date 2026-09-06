@@ -26,7 +26,8 @@ export default function DonatePage() {
             Power the next era of XLM farming.
           </h1>
           <p className="relative mt-4 text-sm leading-6 text-[#94A3B8]">
-            Your support helps build new features, improve infrastructure, and grow the Stellar Farm community.
+            Your support helps build new features, improve infrastructure, and
+            grow the Stellar Farm community.
           </p>
         </section>
 
@@ -52,7 +53,7 @@ export default function DonatePage() {
             onClick={copyAddress}
             className="mt-4 w-full rounded-xl bg-[#6C38FF] py-3 text-sm font-semibold text-white transition hover:bg-[#5A2EE5] active:scale-[0.99]"
           >
-            {copied ? "✓ Address copied" : "Copy Stellar address"}
+            {copied ? "✓ Address copied" : "Copy address"}
           </button>
         </section>
 

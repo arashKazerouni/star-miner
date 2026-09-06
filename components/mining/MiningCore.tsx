@@ -1,3 +1,5 @@
+import { FarmLogo } from "../FarmLogo";
+
 type MiningCoreProps = {
   balance: number;
   miningRate: number;
@@ -5,14 +7,11 @@ type MiningCoreProps = {
 };
 
 function formatRate(rate: number) {
-  if (rate >= 0.000001) return rate.toFixed(7);
+  if (rate >= 0.01) return rate.toFixed(2);
   return rate.toExponential(2);
 }
 
-export default function MiningCore({
-  balance,
-  miningRate,
-}: MiningCoreProps) {
+export default function MiningCore({ balance, miningRate }: MiningCoreProps) {
   return (
     <section className="flex flex-col items-center gap-6">
       <div className="text-center">
@@ -28,9 +27,7 @@ export default function MiningCore({
       <div className="relative flex h-40 w-40 items-center justify-center">
         <div className="absolute h-32 w-32 rounded-full border border-zinc-800" />
         <div className="absolute h-24 w-24 rounded-full border border-zinc-700" />
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black">
-          <span className="text-lg">✦</span>
-        </div>
+        <FarmLogo size={92} />
       </div>
 
       <div className="flex items-center gap-2 text-xs text-zinc-400">
