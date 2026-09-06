@@ -13,6 +13,10 @@ const links = [
 export default function BottomNav() {
   const pathname = usePathname();
 
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#22222D] bg-[#09090D]/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-md items-center justify-around gap-1 px-3 py-3">
