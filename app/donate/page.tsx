@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const STELLAR_ADDRESS =
-  "GCTUBTBCTTFKHHAC747IPRNGIUFFKAHCO5UJF6UVHCLO44SPK3VUA6PX";
+  "GBF7ZMNV4L2PFQRHJEMQLH7FEYMIP4ZSUKQ42ZOCYL5MI5P234C2NMNB";
 
 export default function DonatePage() {
   const [copied, setCopied] = useState(false);
@@ -41,7 +41,7 @@ export default function DonatePage() {
 
           <div className="mt-6 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-4">
             <p className="text-xs uppercase tracking-widest text-[#64748B]">
-              Stellar wallet address
+              Wallet address
             </p>
             <p className="mt-3 break-all font-mono text-xs leading-5 text-[#94A3B8]">
               {STELLAR_ADDRESS}
