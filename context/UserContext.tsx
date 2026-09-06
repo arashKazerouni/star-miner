@@ -11,6 +11,8 @@ type UserContextType = {
   currentBalance: number;
 };
 
+const UserContext = createContext<UserContextType | null>(null);
+
 const DEMO_USER: User = {
   id: "demo-id",
   balance: 0,
