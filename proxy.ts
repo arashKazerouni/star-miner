@@ -72,7 +72,7 @@ export async function proxy(request: NextRequest) {
 
   if (claims && isAuthRoute) {
     const appUrl = request.nextUrl.clone();
-    appUrl.pathname = "/";
+    appUrl.pathname = "/dashboard";
     appUrl.search = "";
 
     return NextResponse.redirect(appUrl);
