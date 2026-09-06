@@ -45,7 +45,7 @@ export default function FarmXlmPrice({ compact = false }: { compact?: boolean })
       }
     };
 
-    load();
+    void load();
     const interval = window.setInterval(load, REFRESH_MS);
 
     return () => {
@@ -54,12 +54,17 @@ export default function FarmXlmPrice({ compact = false }: { compact?: boolean })
     };
   }, []);
 
+  const price = data?.price;
+  const farmUsd = data?.farmUsd;
+  const xlmUsd = data?.xlmUsd;
+  const inversePrice = data?.inversePrice;
+
   if (compact) {
     return (
       <div className="text-right">
         <div className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">Live FARM value</div>
         <div className="mt-1 font-bold tabular-nums text-white">
-          {data ? `1 FARM = ${formatNumber(data.price)} XLM` : loading ? "Loading live value..." : "Live value unavailable"}
+          {typeof price === "number" ? `1 FARM = ${formatNumber(price)} XLM` : loading ? "Loading live value..." : "Live value unavailable"}
         </div>
       </div>
     );
@@ -75,19 +80,23 @@ export default function FarmXlmPrice({ compact = false }: { compact?: boolean })
         <div className="rounded-xl border border-[#22222D] bg-[#0F0F14] px-3 py-3">
           <div className="text-[10px] uppercase tracking-[0.16em] text-slate-500">FARM / XLM</div>
           <div className="mt-1 font-bold tabular-nums text-white">
-            {data ? formatNumber(data.price) : loading ? "…" : "—"}
+            {typeof price === "number" ? formatNumber(price) : loading ? "…" : "—"}
           </div>
         </div>
         <div className="rounded-xl border border-[#22222D] bg-[#0F0F14] px-3 py-3">
           <div className="text-[10px] uppercase tracking-[0.16em] text-slate-500">1 FARM</div>
           <div className="mt-1 font-bold tabular-nums text-white">
-            {data ? formatUsd(data.farmUsd ?? 0) : loading ? "…" : "—"}
+            {typeof farmUsd === "number" ? formatUsd(farmUsd) : loading ? "…" : "—"}
           </div>
         </div>
         <div className="rounded-xl border border-[#22222D] bg-[#0F0F14] px-3 py-3">
           <div className="text-[10px] uppercase tracking-[0.16em] text-slate-500">1 XLM</div>
           <div className="mt-1 font-bold tabular-nums text-white">
-            {data ? `${formatUsd(data.xlmUsd ?? 0)} / ${formatNumber(data.inversePrice ?? 0)} FARM` : loading ? "…" : "—"}
+            {typeof xlmUsd === "number" && typeof inversePrice === "number"
+              ? `${formatUsd(xlmUsd)} / ${formatNumber(inversePrice)} FARM`
+              : loading
+                ? "…"
+                : "—"}
           </div>
         </div>
       </div>
