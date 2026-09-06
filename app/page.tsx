@@ -43,19 +43,12 @@ export default async function Home({
         <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-[#94A3B8] sm:text-lg">
           Stellar Farm is a yield-focused platform built around XLM-based participation, transparent on-chain activity, and the FARM ecosystem.
         </p>
-        <div className="mt-7 mx-auto max-w-sm rounded-2xl border border-[#6C38FF]/25 bg-[#121217]/80 px-6 py-4 backdrop-blur">
-          <FarmXlmPrice />
-        </div>
         <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href={`/register${referralQuery}`} className="rounded-xl bg-[#6C38FF] px-7 py-4 text-sm font-bold shadow-[0_8px_35px_rgba(108,56,255,0.3)] transition hover:-translate-y-0.5 hover:bg-[#5A2EE5]">Start your journey <span aria-hidden="true">→</span></Link>
           <Link href={`/login${referralQuery}`} className="rounded-xl border border-[#22222D] bg-[#121217]/80 px-7 py-4 text-sm font-semibold text-white backdrop-blur transition hover:border-[#353545] hover:bg-[#181820]">Access dashboard</Link>
         </div>
-        <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-          {[["FARM", "Native ecosystem token"], ["XLM", "Stellar-based participation"], ["7 decimals", "Precision token display"]].map(([value, label]) => (
-            <div key={value} className="rounded-2xl border border-[#22222D] bg-[#121217]/70 p-5 text-left backdrop-blur">
-              <div className="text-lg font-bold">{value}</div><div className="mt-1 text-xs text-[#64748B]">{label}</div>
-            </div>
-          ))}
+        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-[#22222D] bg-[#121217]/70 p-4 backdrop-blur">
+          <FarmXlmPrice />
         </div>
       </section>
 
