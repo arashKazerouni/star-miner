@@ -11,8 +11,8 @@ import { createClient } from "@/lib/supabase/client";
 import { WITHDRAWAL_THRESHOLD } from "@/lib/withdrawal";
 
 function formatRate(rate: number) {
-  if (rate >= 0.000001) return rate.toFixed(7);
-  return rate.toExponential(2);
+  if (rate >= 0.001) return rate.toFixed(3);
+  return rate.toFixed(6);
 }
 
 export default function MiningDashboard() {
@@ -96,7 +96,7 @@ export default function MiningDashboard() {
                   </div>
                   <div className="rounded-xl border border-[#22222D] bg-[#121217] p-3">
                     <p className="text-xs text-[#64748B]">Boost</p>
-                    <p className="mt-1 text-lg font-bold text-emerald-400">+{(user.referrals * 0.5).toFixed(1)}e-6</p>
+                    <p className="mt-1 text-lg font-bold text-emerald-400">+{(user.referrals * 0.01).toFixed(2)} FARM/h</p>
                   </div>
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function MiningDashboard() {
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-[#64748B]">Withdrawal progress</p>
-                <p className="mt-2 text-sm text-[#94A3B8]">Reach {WITHDRAWAL_THRESHOLD.toFixed(3)} FARM to unlock a withdrawal request.</p>
+                <p className="mt-2 text-sm text-[#94A3B8]">Reach {WITHDRAWAL_THRESHOLD.toFixed(0)} FARM to unlock a withdrawal request.</p>
               </div>
               <span className="font-mono text-sm font-bold text-[#A78BFA]">{progress.toFixed(0)}%</span>
             </div>
