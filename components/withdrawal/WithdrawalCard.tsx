@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const STELLAR_PUBLIC_KEY = /^G[A-Z2-7]{55}$/;
@@ -39,6 +39,10 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
     setHistoryLoading(false);
   }
 
+  useEffect(() => {
+    void loadHistory();
+  }, []);
+
   async function requestWithdrawal(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -69,10 +73,6 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
       await loadHistory();
     }
     setLoading(false);
-  }
-
-  if (!history.length && historyLoading) {
-    void loadHistory();
   }
 
   return (
@@ -151,15 +151,15 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
               <p className="text-sm text-slate-400">No withdrawal requests yet.</p>
               <p className="mt-1 text-xs text-slate-600">Your requests and statuses will appear here.</p>
             </div>
+          ) : historyLoading ? (
+            <div className="rounded-2xl border border-[#292935] px-4 py-8 text-center text-xs text-slate-600">Loading withdrawal history...</div>
           ) : (
             history.map((item) => (
               <div key={item.id} className="rounded-2xl border border-[#292935] bg-[#0F0F14] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-mono text-sm font-semibold">{Number(item.amount).toFixed(6)} XLM</p>
-                    <p className="mt-1 text-[11px] text-slate-600">
-                      {new Date(item.created_at).toLocaleString()}
-                    </p>
+                    <p className="mt-1 text-[11px] text-slate-600">{new Date(item.created_at).toLocaleString()}</p>
                   </div>
                   <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${
                     item.status === "completed" ? "bg-emerald-500/10 text-emerald-400" :
