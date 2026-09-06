@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const STELLAR_PUBLIC_KEY = /^G[A-Z2-7]{55}$/;
+const WITHDRAWALS_ENABLED = false;
 
 type Withdrawal = {
   id: number;
@@ -17,6 +18,32 @@ type WithdrawalCardProps = {
   balance: number;
   threshold: number;
 };
+
+function ComingSoonState() {
+  return (
+    <section className="rounded-3xl border border-[#292935] bg-[#121217] p-6 sm:p-8">
+      <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[#3A315C] bg-[#1B1730] text-2xl">
+          ✦
+        </div>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-[#9B8AFF]">FARM withdrawals</p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">Coming Soon</h1>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+          We&apos;re building the next stage of FARM before opening withdrawals. FARM is not listed yet, and we want the ecosystem, liquidity, and utility to be ready before we turn withdrawals on.
+        </p>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+          Every miner, referral, and active member helps move FARM from an idea into a real ecosystem. Keep building your balance, invite people who believe in the project, and stay with us as we work toward meaningful utility and market access.
+        </p>
+        <div className="mt-7 rounded-2xl border border-[#292935] bg-[#0F0F14] p-4 text-left">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Our approach</p>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            We&apos;ll enable withdrawals when FARM has the foundation to support them responsibly. Until then, your mining balance remains visible and your progress stays part of the journey.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function WithdrawalCard({ balance, threshold }: WithdrawalCardProps) {
   const available = balance >= threshold;
@@ -40,7 +67,11 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
   }
 
   useEffect(() => {
-    void loadHistory();
+    if (WITHDRAWALS_ENABLED) {
+      void loadHistory();
+    } else {
+      setHistoryLoading(false);
+    }
   }, []);
 
   async function requestWithdrawal(event: FormEvent<HTMLFormElement>) {
@@ -55,7 +86,7 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
     }
 
     if (!available) {
-      setError(`You need ${remaining.toFixed(6)} XLM more before withdrawing.`);
+      setError(`You need ${remaining.toFixed(6)} FARM more before withdrawing.`);
       return;
     }
 
@@ -75,6 +106,10 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
     setLoading(false);
   }
 
+  if (!WITHDRAWALS_ENABLED) {
+    return <ComingSoonState />;
+  }
+
   return (
     <section className="space-y-5">
       <div className="rounded-2xl border border-[#292935] bg-[#0F0F14] p-5">
@@ -91,16 +126,16 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
         </div>
         <div className="mt-4 flex justify-between text-sm">
           <span className="text-slate-500">Minimum</span>
-          <span className="font-mono">{threshold.toFixed(6)} XLM</span>
+          <span className="font-mono">{threshold.toFixed(6)} FARM</span>
         </div>
       </div>
 
       {available ? (
         <form onSubmit={requestWithdrawal} className="rounded-3xl border border-[#292935] bg-[#121217] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Request payout</p>
-          <h2 className="mt-2 text-xl font-bold">Send XLM to your Stellar wallet</h2>
+          <h2 className="mt-2 text-xl font-bold">Send FARM to your Stellar wallet</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            Your full eligible balance will be reserved for this request. Double-check the destination before submitting.
+            Your full eligible FARM balance will be reserved for this request. Double-check the destination before submitting.
           </p>
 
           <label className="mt-5 block text-xs font-medium text-slate-400" htmlFor="stellar-wallet">
@@ -124,14 +159,14 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
             disabled={loading || !wallet}
             className="mt-4 w-full rounded-2xl bg-[#6C38FF] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#5A2EE5] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {loading ? "Submitting request..." : `Request ${balance.toFixed(6)} XLM`}
+            {loading ? "Submitting request..." : `Request ${balance.toFixed(6)} FARM`}
           </button>
         </form>
       ) : (
         <div className="rounded-2xl border border-[#22222D] bg-[#0F0F14] p-5">
           <p className="text-sm font-semibold text-slate-300">Withdrawal locked</p>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            You need <span className="font-mono text-slate-300">{remaining.toFixed(6)} XLM</span> more to unlock withdrawals.
+            You need <span className="font-mono text-slate-300">{remaining.toFixed(6)} FARM</span> more to unlock withdrawals.
           </p>
         </div>
       )}
@@ -158,7 +193,7 @@ export default function WithdrawalCard({ balance, threshold }: WithdrawalCardPro
               <div key={item.id} className="rounded-2xl border border-[#292935] bg-[#0F0F14] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-mono text-sm font-semibold">{Number(item.amount).toFixed(6)} XLM</p>
+                    <p className="font-mono text-sm font-semibold">{Number(item.amount).toFixed(6)} FARM</p>
                     <p className="mt-1 text-[11px] text-slate-600">{new Date(item.created_at).toLocaleString()}</p>
                   </div>
                   <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${
