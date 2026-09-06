@@ -51,7 +51,7 @@ begin
   end if;
 
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
-  reward := profile.mining_rate * (elapsed_seconds / 60);
+  reward := profile.mining_rate * (elapsed_seconds / 3600);
   withdrawal_amount := profile.balance + reward;
 
   if withdrawal_amount < 0.001 then
