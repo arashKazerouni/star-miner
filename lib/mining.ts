@@ -1,8 +1,14 @@
-export const BASE_MINING_RATE = 0.002;
+export const BASE_MINING_RATE = 0.0000025;
+export const REFERRAL_MINING_BONUS = 0.0000005;
+
+export function calculateMiningRate(referrals: number) {
+  const safeReferrals = Math.max(0, Math.floor(Number(referrals) || 0));
+  return BASE_MINING_RATE + safeReferrals * REFERRAL_MINING_BONUS;
+}
 
 export function calculateMiningReward(
   miningRate: number,
-  elapsedSeconds: number
+  elapsedSeconds: number,
 ) {
   return miningRate * (elapsedSeconds / 3600);
 }
@@ -10,13 +16,10 @@ export function calculateMiningReward(
 export function calculateCurrentBalance(
   balance: number,
   miningRate: number,
-  lastMiningUpdate: number
+  lastMiningUpdate: number,
+  now = Date.now(),
 ) {
-  const elapsedSeconds =
-    (Date.now() - lastMiningUpdate) / 1000;
+  const elapsedSeconds = Math.max((now - lastMiningUpdate) / 1000, 0);
 
-  return (
-    balance +
-    calculateMiningReward(miningRate, elapsedSeconds)
-  );
+  return balance + calculateMiningReward(miningRate, elapsedSeconds);
 }
