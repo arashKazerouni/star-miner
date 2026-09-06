@@ -22,6 +22,10 @@ const DEMO_USER: User = {
   referralCode: "",
 };
 
+function getCanonicalMiningRate(referrals: unknown) {
+  return calculateMiningRate(Number(referrals) || 0);
+}
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(DEMO_USER);
   const [currentBalance, setCurrentBalance] = useState(DEMO_USER.balance);
@@ -69,11 +73,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (error || !data?.[0] || !active) return;
 
         const profile = data[0];
+        const referrals = Number(profile.referrals) || 0;
         const nextUser: User = {
           id: authUser.id,
           balance: Number(profile.balance),
-          referrals: profile.referrals,
-          miningRate: Number(profile.mining_rate),
+          referrals,
+          // Never trust a stale persisted mining_rate for the client display.
+          // The canonical rate is base rate + referral bonus.
+          miningRate: getCanonicalMiningRate(referrals),
           lastMiningUpdate: new Date(profile.last_mining_update).getTime(),
           referralCode: profile.referral_code,
         };
@@ -113,13 +120,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         const profile = data[0];
         const balance = Number(profile.balance);
-        const miningRate = Number(profile.mining_rate);
+        const referrals = Number(profile.referrals) || 0;
+        const miningRate = getCanonicalMiningRate(referrals);
         const lastMiningUpdate = new Date(profile.last_mining_update).getTime();
 
         setUser((current) => ({
           ...current,
+          // `balance` is the FARM balance from public.profiles, not the
+          // user's Stellar/XLM wallet balance.
           balance,
-          referrals: profile.referrals,
+          referrals,
           miningRate,
           lastMiningUpdate,
           referralCode: profile.referral_code,
@@ -137,7 +147,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (user.id === DEMO_USER.id) return;
 
     const interval = setInterval(() => {
-      const elapsedSeconds = (Date.now() - user.lastMiningUpdate) / 1000;
+      const elapsedSeconds = Math.max(
+        (Date.now() - user.lastMiningUpdate) / 1000,
+        0,
+      );
 
       setCurrentBalance(
         user.balance + calculateMiningReward(user.miningRate, elapsedSeconds),
