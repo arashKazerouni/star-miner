@@ -8,11 +8,16 @@ import FarmXlmPrice from "@/components/market/FarmXlmPrice";
 import { useUser } from "@/context/UserContext";
 import { createClient } from "@/lib/supabase/client";
 
+function formatRate(rate: number) {
+  if (rate >= 0.000001) return rate.toFixed(7);
+  return rate.toExponential(2);
+}
+
 const stats = [
-  ["Current Balance", "XLM"],
-  ["Mining Rate", "XLM/hour"],
-  ["Funded Balance", "XLM"],
-];
+  ["Current Balance", "FARM"],
+  ["Mining Rate", "FARM/hour"],
+  ["Referrals", "users"],
+] as const;
 
 export default function MiningDashboard() {
   const { user, currentBalance } = useUser();
@@ -48,18 +53,27 @@ export default function MiningDashboard() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          {stats.map(([title, unit]) => (
-            <div
-              key={title}
-              className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-card)] p-5"
-            >
-              <p className="text-sm text-slate-400">{title}</p>
-              <p className="mt-3 text-3xl font-bold tabular-nums w-full">
-                {title === "Current Balance" ? currentBalance.toFixed(4) : "12.5000"}{" "}
-                <span className="text-sm text-slate-400">{unit}</span>
-              </p>
-            </div>
-          ))}
+          {stats.map(([title, unit]) => {
+            const value =
+              title === "Current Balance"
+                ? currentBalance.toFixed(7)
+                : title === "Mining Rate"
+                  ? formatRate(user.miningRate)
+                  : String(user.referrals);
+
+            return (
+              <div
+                key={title}
+                className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-card)] p-5"
+              >
+                <p className="text-sm text-slate-400">{title}</p>
+                <p className="mt-3 text-3xl font-bold tabular-nums w-full">
+                  {value}{" "}
+                  <span className="text-sm text-slate-400">{unit}</span>
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         <div className="mt-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-card)] p-6">
