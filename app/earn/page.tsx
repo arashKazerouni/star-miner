@@ -1,58 +1,163 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import BottomNav from "@/components/navigation/BottomNav";
 import ReferralStats from "@/components/referrals/ReferralStats";
 import ReferralProgress from "@/components/referrals/ReferralProgress";
 import { getNextReferralTarget } from "@/lib/referrals";
 
+const WITHDRAWAL_THRESHOLD = 0.001;
+
 export default function EarnPage() {
-  const { user } = useUser();
+  const { user, currentBalance } = useUser();
   const [copied, setCopied] = useState(false);
   const referrals = user.referrals;
   const miningRate = user.miningRate;
   const nextTarget = getNextReferralTarget(referrals);
-  const referralLink =
-    user.referralCode && typeof window !== "undefined"
-      ? `${window.location.origin}/?ref=${user.referralCode}`
-      : "";
+
+  const referralLink = useMemo(
+    () =>
+      user.referralCode && typeof window !== "undefined"
+        ? `${window.location.origin}/?ref=${user.referralCode}`
+        : "",
+    [user.referralCode],
+  );
+
+  const referralBonus = Math.max(miningRate - 0.0000025, 0);
+  const baseRate = 0.0000025;
+  const progressToWithdraw = Math.min(
+    (currentBalance / WITHDRAWAL_THRESHOLD) * 100,
+    100,
+  );
 
   async function copyReferralLink() {
     if (!referralLink) return;
-    await navigator.clipboard.writeText(referralLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
   }
 
   return (
-    <main className="relative z-0 min-h-screen bg-[#09090D] px-5 py-10 pb-36 text-white">
+    <main className="relative z-0 min-h-screen bg-[#09090D] px-5 py-8 pb-36 text-white">
       <div className="mx-auto max-w-md">
-        <section className="relative overflow-hidden rounded-3xl border border-[#22222D] bg-[#121217] p-6 shadow-2xl">
-          <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[#6C38FF]/20 blur-3xl" />
-          <p className="relative text-xs uppercase tracking-[0.35em] text-slate-500">Earn XLM</p>
-          <h1 className="relative mt-4 text-4xl font-bold tracking-tight">Grow your farm</h1>
-          <p className="relative mt-3 text-sm leading-6 text-slate-400">
-            Invite farmers, increase your mining power, and unlock more Stellar rewards.
+        <header className="mb-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#8B7CF6]">
+            Earn more FARM
           </p>
-          <div className="mt-6 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-5">
-            <p className="text-xs uppercase tracking-widest text-slate-500">Mining boost</p>
-            <p className="mt-2 text-3xl font-bold tabular-nums">{miningRate} XLM</p>
-            <p className="mt-1 text-xs text-[#10B981]">Active reward multiplier</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight">Grow your farm</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            Build your mining rate by bringing more farmers into the network.
+          </p>
+        </header>
+
+        <section className="relative overflow-hidden rounded-3xl border border-[#292935] bg-[#121217] p-6 shadow-2xl">
+          <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[#6C38FF]/20 blur-3xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Current balance</p>
+                <p className="mt-2 text-4xl font-bold tabular-nums">{currentBalance.toFixed(6)}</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">FARM</p>
+              </div>
+              <div className="rounded-2xl border border-[#2B2744] bg-[#19152A] px-3 py-2 text-right">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500">Mining rate</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-[#B9ACFF]">
+                  {miningRate.toFixed(7)} / hr
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <div className="mb-2 flex justify-between text-[11px] text-slate-500">
+                <span>Progress to minimum withdrawal</span>
+                <span>{progressToWithdraw.toFixed(1)}%</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-[#24242D]">
+                <div
+                  className="h-full rounded-full bg-[#8B5CF6] transition-all duration-500"
+                  style={{ width: `${progressToWithdraw}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                {currentBalance >= WITHDRAWAL_THRESHOLD
+                  ? "Minimum withdrawal reached."
+                  : `${(WITHDRAWAL_THRESHOLD - currentBalance).toFixed(6)} FARM remaining`}
+              </p>
+            </div>
           </div>
         </section>
-        <section className="mt-6 space-y-4">
-          <ReferralStats referrals={referrals} miningRate={miningRate} />
-          <ReferralProgress referrals={referrals} target={nextTarget} />
-        </section>
-        <section className="mt-8 rounded-3xl border border-[#22222D] bg-[#121217] p-5">
-          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Your referral link</p>
-          <div className="mt-4 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-4">
-            <code className="block truncate text-xs text-slate-300">{referralLink || "Loading referral link..."}</code>
+
+        <section className="mt-5 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-4">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Your referrals</p>
+            <p className="mt-2 text-2xl font-bold tabular-nums">{referrals}</p>
+            <p className="mt-1 text-xs text-slate-500">active farmers</p>
           </div>
-          <button type="button" onClick={copyReferralLink} disabled={!referralLink} className="mt-4 w-full rounded-xl bg-[#6C38FF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#5A2EE5] disabled:opacity-40">
-            {copied ? "Copied!" : "Copy referral link"}
+          <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-4">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Referral boost</p>
+            <p className="mt-2 text-2xl font-bold tabular-nums">+{referralBonus.toFixed(7)}</p>
+            <p className="mt-1 text-xs text-slate-500">FARM / hour</p>
+          </div>
+        </section>
+
+        <section className="mt-5 rounded-3xl border border-[#22222D] bg-[#121217] p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Referral rewards</p>
+              <h2 className="mt-2 text-xl font-bold">Every farmer makes you stronger</h2>
+            </div>
+            <div className="rounded-xl bg-[#1A1728] px-3 py-2 text-center">
+              <p className="text-lg font-bold text-[#B9ACFF]">+20%</p>
+              <p className="text-[9px] uppercase tracking-wider text-slate-500">per referral</p>
+            </div>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-400">
+            Your base mining rate is {baseRate.toFixed(7)} FARM/hour. Each successful referral adds another 20% of the base rate.
+          </p>
+          <div className="mt-5">
+            <ReferralStats referrals={referrals} miningRate={miningRate} />
+            <ReferralProgress referrals={referrals} target={nextTarget} />
+          </div>
+        </section>
+
+        <section className="mt-5 rounded-3xl border border-[#22222D] bg-[#121217] p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Invite & earn</p>
+          <h2 className="mt-2 text-xl font-bold">Share your FARM link</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            Send your personal link to a friend. Once they join through it, your referral count and mining rate increase.
+          </p>
+          <div className="mt-4 rounded-2xl border border-[#292935] bg-[#0F0F14] p-4">
+            <code className="block truncate text-xs text-slate-300">
+              {referralLink || "Loading referral link..."}
+            </code>
+          </div>
+          <button
+            type="button"
+            onClick={copyReferralLink}
+            disabled={!referralLink}
+            className="mt-4 w-full rounded-2xl bg-[#6C38FF] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#5A2EE5] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {copied ? "Referral link copied" : "Copy referral link"}
           </button>
+        </section>
+
+        <section className="mt-5 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-4">
+          <div className="flex gap-3">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1B1730] text-sm text-[#B9ACFF]">
+              ✦
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Keep mining consistently</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Your balance grows automatically while mining is active. Referrals are the main way to increase your earning rate.
+              </p>
+            </div>
+          </div>
         </section>
       </div>
       <BottomNav />
