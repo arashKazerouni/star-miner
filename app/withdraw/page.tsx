@@ -19,7 +19,7 @@ export default function WithdrawPage() {
             FARM payouts
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">
-            Withdraw XLM
+            Withdraw Your FARMs 
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-400">
             Request your mined balance to any Stellar public wallet and track
@@ -30,7 +30,7 @@ export default function WithdrawPage() {
         <section className="relative overflow-hidden rounded-3xl border border-[#292935] bg-[#121217] p-6 shadow-2xl">
           <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[#6C38FF]/20 blur-3xl" />
           <div className="relative">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
                   Available balance
@@ -38,7 +38,7 @@ export default function WithdrawPage() {
                 <p className="mt-2 font-mono text-4xl font-bold tabular-nums">
                   {currentBalance.toFixed(6)}
                 </p>
-                <p className="mt-1 text-xs font-medium text-slate-500">XLM</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">FARM</p>
               </div>
               <div
                 className={`rounded-2xl border px-3 py-2 text-right ${eligible ? "border-[#3B2A67] bg-[#19152A]" : "border-[#292935] bg-[#0F0F14]"}`}

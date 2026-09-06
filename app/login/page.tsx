@@ -37,13 +37,16 @@ export default function LoginPage() {
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#09090D] px-6 text-white">
       <div className="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(circle_at_50%_0%,rgba(108,56,255,0.15),transparent_70%)]" />
       <div className="relative w-full max-w-[440px]">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#6C38FF] text-xl font-bold shadow-[0_0_30px_rgba(108,56,255,0.35)]">
-            <FarmLogo size={52} />
-          </div>
-          <h1 className="text-[28px] font-bold">Stellar FARM</h1>
-          <p className="mt-2 text-sm text-[#94A3B8]">
-            Farm rewards. Grow with Stellar.
+        <div className="mb-8 text-[28px] font-bold flex flex-col items-center gap-0.5">
+          <h1 className="flex items-center">
+            <span className="mr-1.5">
+              {" "}
+              <FarmLogo size={52} />
+            </span>
+            Stellar FARM{" "}
+          </h1>
+          <p className="text-sm  text-[#94A3B8]">
+            Farm rewards. Grow with Stellar...
           </p>
         </div>
         <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-6 shadow-xl">

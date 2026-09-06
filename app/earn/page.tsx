@@ -49,7 +49,9 @@ export default function EarnPage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#8B7CF6]">
             Earn more FARM
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight">Grow your farm</h1>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight">
+            Grow your farm
+          </h1>
           <p className="mt-2 text-sm leading-6 text-slate-400">
             Build your mining rate by bringing more farmers into the network.
           </p>
@@ -60,12 +62,18 @@ export default function EarnPage() {
           <div className="relative">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Current balance</p>
-                <p className="mt-2 text-4xl font-bold tabular-nums">{currentBalance.toFixed(6)}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  Current balance
+                </p>
+                <p className="mt-2 text-4xl font-bold tabular-nums">
+                  {currentBalance.toFixed(6)}
+                </p>
                 <p className="mt-1 text-xs font-medium text-slate-500">FARM</p>
               </div>
               <div className="rounded-2xl border border-[#2B2744] bg-[#19152A] px-3 py-2 text-right">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500">Mining rate</p>
+                <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                  Mining rate
+                </p>
                 <p className="mt-1 font-mono text-sm font-semibold text-[#B9ACFF]">
                   {miningRate.toFixed(2)} / hr
                 </p>
@@ -94,13 +102,19 @@ export default function EarnPage() {
 
         <section className="mt-5 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-4">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Your referrals</p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
+              Your referrals
+            </p>
             <p className="mt-2 text-2xl font-bold tabular-nums">{referrals}</p>
             <p className="mt-1 text-xs text-slate-500">active farmers</p>
           </div>
           <div className="rounded-2xl border border-[#22222D] bg-[#121217] p-4">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Referral boost</p>
-            <p className="mt-2 text-2xl font-bold tabular-nums">+{referralBonus.toFixed(2)}</p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
+              Referral boost
+            </p>
+            <p className="mt-2 text-2xl font-bold tabular-nums">
+              +{referralBonus.toFixed(2)}
+            </p>
             <p className="mt-1 text-xs text-slate-500">FARM / hour</p>
           </div>
         </section>
@@ -108,16 +122,26 @@ export default function EarnPage() {
         <section className="mt-5 rounded-3xl border border-[#22222D] bg-[#121217] p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Referral rewards</p>
-              <h2 className="mt-2 text-xl font-bold">Every farmer makes you stronger</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Referral rewards
+              </p>
+              <h2 className="mt-2 text-xl font-bold">
+                Every farmer makes you stronger
+              </h2>
             </div>
             <div className="rounded-xl bg-[#1A1728] px-3 py-2 text-center">
-              <p className="text-lg font-bold text-[#B9ACFF]">+{REFERRAL_MINING_BONUS.toFixed(2)}</p>
-              <p className="text-[9px] uppercase tracking-wider text-slate-500">FARM / hour</p>
+              <p className="text-lg font-bold text-[#B9ACFF]">
+                +{REFERRAL_MINING_BONUS.toFixed(2)}
+              </p>
+              <p className="text-[9px] uppercase tracking-wider text-slate-500">
+                FARM / hour
+              </p>
             </div>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-400">
-            Your base mining rate is {BASE_MINING_RATE.toFixed(2)} FARM/hour. Each successful referral adds {REFERRAL_MINING_BONUS.toFixed(2)} FARM/hour.
+            Your base mining rate is {BASE_MINING_RATE.toFixed(2)} FARM/hour.
+            Each successful referral adds {REFERRAL_MINING_BONUS.toFixed(2)}{" "}
+            FARM/hour.
           </p>
           <div className="mt-5">
             <ReferralStats referrals={referrals} miningRate={miningRate} />
@@ -126,10 +150,13 @@ export default function EarnPage() {
         </section>
 
         <section className="mt-5 rounded-3xl border border-[#22222D] bg-[#121217] p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Invite & earn</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+            Invite & earn
+          </p>
           <h2 className="mt-2 text-xl font-bold">Share your FARM link</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            Send your personal link to a friend. Once they join through it, your referral count and mining rate increase.
+            Send your personal link to a friend. Once they join through it, your
+            referral count and mining rate increase.
           </p>
           <div className="mt-4 rounded-2xl border border-[#292935] bg-[#0F0F14] p-4">
             <code className="block truncate text-xs text-slate-300">
@@ -148,13 +175,14 @@ export default function EarnPage() {
 
         <section className="mt-5 rounded-2xl border border-[#22222D] bg-[#0F0F14] p-4">
           <div className="flex gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1B1730] text-sm text-[#B9ACFF]">
+            <div className="">
               <FarmLogo size={48} />
             </div>
             <div>
               <p className="text-sm font-semibold">Keep mining consistently</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
-                Your balance grows automatically while mining is active. Referrals are the main way to increase your earning rate.
+                Your balance grows automatically while mining is active.
+                Referrals are the main way to increase your earning rate.
               </p>
             </div>
           </div>

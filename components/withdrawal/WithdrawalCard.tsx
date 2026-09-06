@@ -24,8 +24,8 @@ function ComingSoonState() {
   return (
     <section className="rounded-3xl border border-[#292935] bg-[#121217] p-6 sm:p-8">
       <div className="mx-auto max-w-2xl text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[#3A315C] bg-[#1B1730] text-2xl">
-          <FarmLogo size={48} />
+        <div className="mx-auto flex items-center justify-center mb-[-1rem]">
+          <FarmLogo size={72} />
         </div>
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-[#9B8AFF]">
           FARM withdrawals
