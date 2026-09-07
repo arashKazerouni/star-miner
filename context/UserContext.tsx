@@ -134,7 +134,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           lastMiningUpdate,
           referralCode: profile.referral_code,
         }));
-        setCurrentBalance(balance);
+        // Do not overwrite the live UI balance here. The live-balance timer
+        // derives it from the newly synced server snapshot. Resetting it here
+        // caused the displayed balance to jump backwards every sync cycle.
       } catch {
         // Ignore transient Supabase failures.
       }
