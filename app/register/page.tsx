@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FarmLogo } from "@/components/FarmLogo";
 
 export default function RegisterPage() {
@@ -17,6 +18,8 @@ export default function RegisterPage() {
 
   async function handleRegister(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
+
     setError("");
 
     if (password !== confirmPassword) {
@@ -26,24 +29,38 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    const referralCode = new URLSearchParams(window.location.search).get("ref");
-    if (referralCode)
-      localStorage.setItem("stellar-farm-referral", referralCode);
+    try {
+      const referralCode = new URLSearchParams(window.location.search).get("ref");
+      if (referralCode) {
+        localStorage.setItem("stellar-farm-referral", referralCode);
+      }
 
-    // Create the Supabase browser client only when the form is submitted.
-    // This prevents Next.js from evaluating it during static prerendering,
-    // where the public Supabase environment variables may not be available.
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({ email, password });
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      // When email confirmation is disabled, Supabase returns a live session.
+      // Send the user straight into the app instead of showing a misleading
+      // "check your email" message.
+      if (data.session) {
+        window.location.assign("/dashboard");
+        return;
+      }
+
+      setSuccess(true);
       setLoading(false);
-      return;
+    } catch {
+      setError("Unable to create your account right now. Please try again.");
+      setLoading(false);
     }
-
-    setSuccess(true);
-    setLoading(false);
   }
 
   const fields = [
@@ -53,6 +70,7 @@ export default function RegisterPage() {
       setter: setEmail,
       label: "Email",
       type: "email",
+      autoComplete: "email",
     },
     {
       id: "password",
@@ -60,6 +78,7 @@ export default function RegisterPage() {
       setter: setPassword,
       label: "Password",
       type: "password",
+      autoComplete: "new-password",
     },
     {
       id: "confirm",
@@ -67,28 +86,26 @@ export default function RegisterPage() {
       setter: setConfirmPassword,
       label: "Confirm password",
       type: "password",
+      autoComplete: "new-password",
     },
   ];
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#09090D] px-6 py-10 text-white">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#09090D] px-4 py-8 text-white sm:px-6 sm:py-10">
       <div className="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(circle_at_50%_0%,rgba(108,56,255,0.18),transparent_70%)]" />
 
-      <div className="relative mx-auto flex min-h-[90vh] max-w-[440px] flex-col justify-center">
-        <div className="mb-8 text-[28px] font-bold flex flex-col items-center gap-0.5">
-          <h1 className="flex items-center">
+      <div className="relative w-full max-w-[440px]">
+        <div className="mb-7 flex flex-col items-center gap-0.5 text-center sm:mb-8">
+          <h1 className="flex items-center text-2xl font-bold sm:text-[28px]">
             <span className="mr-1.5">
-              {" "}
-              <FarmLogo size={52} />
+              <FarmLogo size={48} />
             </span>
-            Stellar FARM{" "}
+            Stellar FARM
           </h1>
-          <p className="text-sm  text-[#94A3B8]">
-            Farm rewards. Grow with Stellar...
-          </p>
+          <p className="text-sm text-[#94A3B8]">Farm rewards. Grow with Stellar...</p>
         </div>
 
-        <section className="rounded-2xl border border-[#22222D] bg-[#121217] p-6">
+        <section className="rounded-2xl border border-[#22222D] bg-[#121217] p-4 sm:p-6">
           {success ? (
             <div>
               <h2 className="text-lg font-semibold">Check your email</h2>
@@ -96,8 +113,9 @@ export default function RegisterPage() {
                 Confirmation link sent to {email}.
               </p>
               <button
+                type="button"
                 onClick={() => router.replace("/login")}
-                className="mt-6 w-full rounded-lg bg-[#6C38FF] py-3 font-semibold"
+                className="mt-6 w-full rounded-lg bg-[#6C38FF] py-3 font-semibold hover:bg-[#5A2EE5]"
               >
                 Go to login
               </button>
@@ -105,12 +123,12 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="flex rounded-lg bg-[#0F0F14] p-1 text-sm">
-                <a
+                <Link
                   href="/login"
-                  className="flex-1 rounded-md py-2 text-center text-slate-400"
+                  className="flex-1 rounded-md py-2 text-center text-slate-400 hover:text-white"
                 >
                   Log in
-                </a>
+                </Link>
                 <span className="flex-1 rounded-md bg-[#6C38FF] py-2 text-center">
                   Create account
                 </span>
@@ -118,13 +136,14 @@ export default function RegisterPage() {
 
               {fields.map((field) => (
                 <div key={field.id}>
-                  <label className="mb-2 block text-sm text-slate-300">
+                  <label htmlFor={field.id} className="mb-2 block text-sm text-slate-300">
                     {field.label}
                   </label>
                   <input
                     id={field.id}
                     type={field.type}
                     value={field.value}
+                    autoComplete={field.autoComplete}
                     onChange={(e) => field.setter(e.target.value)}
                     required
                     className="w-full rounded-lg border border-[#22222D] bg-[#0F0F14] px-4 py-3 outline-none focus:border-[#6C38FF]"
@@ -133,14 +152,15 @@ export default function RegisterPage() {
               ))}
 
               {error && (
-                <p className="rounded-lg border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+                <p role="alert" className="rounded-lg border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-400">
                   {error}
                 </p>
               )}
 
               <button
+                type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-[#6C38FF] py-3 font-semibold disabled:opacity-50"
+                className="w-full rounded-lg bg-[#6C38FF] py-3 font-semibold transition hover:bg-[#5A2EE5] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Creating account..." : "Create account"}
               </button>
@@ -150,9 +170,9 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-slate-500">
           Already have an account?{" "}
-          <a href="/login" className="text-violet-400">
+          <Link href="/login" className="text-violet-400 hover:text-violet-300">
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </main>
