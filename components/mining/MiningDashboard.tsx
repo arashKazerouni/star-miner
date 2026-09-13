@@ -23,6 +23,10 @@ export default function MiningDashboard() {
     [currentBalance],
   );
 
+  if (!user) {
+    return null;
+  }
+
   async function handleLogout() {
     setLoggingOut(true);
     await createClient().auth.signOut();
