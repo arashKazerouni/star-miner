@@ -134,9 +134,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           lastMiningUpdate,
           referralCode: profile.referral_code,
         }));
-        // Do not overwrite the live UI balance here. The live-balance timer
-        // derives it from the newly synced server snapshot. Resetting it here
-        // caused the displayed balance to jump backwards every sync cycle.
+
+        // sync_mining() settles rewards into the database and returns the
+        // authoritative FARM balance. Re-anchor the live display to that
+        // snapshot so it cannot drift or briefly show an outdated value.
+        setCurrentBalance(balance);
       } catch {
         // Ignore transient Supabase failures.
       }
