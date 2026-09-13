@@ -1,4 +1,4 @@
-export const BASE_MINING_RATE = 0.05;
+export const BASE_MINING_RATE = 100 / 24;
 export const REFERRAL_MINING_BONUS = 0.01;
 
 export function calculateMiningRate(referrals: number) {
