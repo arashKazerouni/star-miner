@@ -1,4 +1,4 @@
-export const WITHDRAWAL_THRESHOLD = 10;
+export const WITHDRAWAL_THRESHOLD = 4500;
 
 export function canWithdraw(balance: number) {
   return balance >= WITHDRAWAL_THRESHOLD;
