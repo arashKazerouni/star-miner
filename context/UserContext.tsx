@@ -7,28 +7,19 @@ import { createClient } from "@/lib/supabase/client";
 import { calculateMiningRate, calculateMiningReward } from "@/lib/mining";
 
 type UserContextType = {
-  user: User;
+  user: User | null;
   currentBalance: number;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
-
-const DEMO_USER: User = {
-  id: "demo-id",
-  balance: 0,
-  referrals: 0,
-  miningRate: calculateMiningRate(0),
-  lastMiningUpdate: Date.now(),
-  referralCode: "",
-};
 
 function getCanonicalMiningRate(referrals: unknown) {
   return calculateMiningRate(Number(referrals) || 0);
 }
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>(DEMO_USER);
-  const [currentBalance, setCurrentBalance] = useState(DEMO_USER.balance);
+  const [user, setUser] = useState<User | null>(null);
+  const [currentBalance, setCurrentBalance] = useState(0);
 
   useEffect(() => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,7 +38,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         if (!authUser) {
           if (active) {
-            setUser(DEMO_USER);
+            setUser(null);
             setCurrentBalance(0);
           }
           return;
@@ -105,7 +96,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (user.id === DEMO_USER.id) return;
+    if (!user) return;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -124,16 +115,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const miningRate = getCanonicalMiningRate(referrals);
         const lastMiningUpdate = new Date(profile.last_mining_update).getTime();
 
-        setUser((current) => ({
-          ...current,
-          // `balance` is the FARM balance from public.profiles, not the
-          // user's Stellar/XLM wallet balance.
-          balance,
-          referrals,
-          miningRate,
-          lastMiningUpdate,
-          referralCode: profile.referral_code,
-        }));
+        setUser((current) =>
+          current
+            ? {
+                ...current,
+                // `balance` is the FARM balance from public.profiles, not the
+                // user's Stellar/XLM wallet balance.
+                balance,
+                referrals,
+                miningRate,
+                lastMiningUpdate,
+                referralCode: profile.referral_code,
+              }
+            : current,
+        );
 
         // Do not write to currentBalance here. The live balance timer is the
         // single display writer; the synced profile becomes its new anchor.
@@ -145,10 +140,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [user.id]);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (user.id === DEMO_USER.id) return;
+    if (!user) return;
 
     const interval = setInterval(() => {
       const elapsedSeconds = Math.max(
@@ -162,7 +157,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }, 250);
 
     return () => clearInterval(interval);
-  }, [user.id, user.balance, user.miningRate, user.lastMiningUpdate]);
+  }, [user]);
 
   const value = useMemo(
     () => ({ user, currentBalance }),
