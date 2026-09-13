@@ -135,10 +135,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           referralCode: profile.referral_code,
         }));
 
-        // sync_mining() settles rewards into the database and returns the
-        // authoritative FARM balance. Re-anchor the live display to that
-        // snapshot so it cannot drift or briefly show an outdated value.
-        setCurrentBalance(balance);
+        // Do not write to currentBalance here. The live balance timer is the
+        // single display writer; the synced profile becomes its new anchor.
+        // This prevents the 5-second server refresh from visibly resetting
+        // the number before the next 250ms calculation.
       } catch {
         // Ignore transient Supabase failures.
       }
