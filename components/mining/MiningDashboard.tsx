@@ -10,8 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { WITHDRAWAL_THRESHOLD } from "@/lib/withdrawal";
 
 function formatRate(rate: number) {
-  if (rate >= 0.001) return rate.toFixed(3);
-  return rate.toFixed(6);
+  return rate.toFixed(4);
 }
 
 export default function MiningDashboard() {
@@ -109,6 +108,9 @@ export default function MiningDashboard() {
                     </p>
                     <p className="mt-2 font-mono text-2xl font-bold tabular-nums">
                       +{formatRate(user.miningRate)}
+                    </p>
+                    <p className="mt-1 text-xs text-[#64748B]">
+                      {(user.miningRate * 24).toFixed(2)} FARM / day
                     </p>
                   </div>
                   <div className="rounded-xl bg-[#6C38FF]/10 px-3 py-2 text-xs font-semibold text-[#A78BFA]">
