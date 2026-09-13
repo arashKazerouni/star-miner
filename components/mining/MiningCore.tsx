@@ -7,8 +7,7 @@ type MiningCoreProps = {
 };
 
 function formatRate(rate: number) {
-  if (rate >= 0.01) return rate.toFixed(2);
-  return rate.toExponential(2);
+  return rate.toFixed(4);
 }
 
 export default function MiningCore({ balance, miningRate }: MiningCoreProps) {
@@ -35,9 +34,12 @@ export default function MiningCore({ balance, miningRate }: MiningCoreProps) {
         Mining active
       </div>
 
-      <p className="font-mono text-xs text-zinc-500">
-        +{formatRate(miningRate)} FARM / hour
-      </p>
+      <div className="text-center font-mono text-xs text-zinc-500">
+        <p>+{formatRate(miningRate)} FARM / hour</p>
+        <p className="mt-1 text-zinc-600">
+          +{(miningRate * 24).toFixed(2)} FARM / day
+        </p>
+      </div>
     </section>
   );
 }
