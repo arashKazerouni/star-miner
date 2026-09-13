@@ -15,6 +15,11 @@ const methods = [["â› Mining","Your passive FARM engine is always working"],["ð
 export default function EarnPage(){
  const {user,currentBalance}=useUser();
  const [copied,setCopied]=useState(false);
+
+ if (!user) {
+  return null;
+ }
+
  const referrals=user.referrals;
  const nextTarget=getNextReferralTarget(referrals);
  const referralLink=useMemo(()=>user.referralCode&&typeof window!=="undefined"?`${window.location.origin}/?ref=${user.referralCode}`:"",[user.referralCode]);
