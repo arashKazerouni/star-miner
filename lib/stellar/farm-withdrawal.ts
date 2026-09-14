@@ -26,6 +26,40 @@ function getDistributionKeypair() {
   return Keypair.fromSecret(secret);
 }
 
+function normalizeInteger(value: string) {
+  const normalized = value.replace(/^0+/, "");
+  return normalized || "0";
+}
+
+function compareIntegers(left: string, right: string) {
+  const a = normalizeInteger(left);
+  const b = normalizeInteger(right);
+
+  if (a.length !== b.length) {
+    return a.length > b.length ? 1 : -1;
+  }
+
+  return a === b ? 0 : a > b ? 1 : -1;
+}
+
+function addIntegers(left: string, right: string) {
+  let a = left.length - 1;
+  let b = right.length - 1;
+  let carry = 0;
+  let result = "";
+
+  while (a >= 0 || b >= 0 || carry > 0) {
+    const sum =
+      (a >= 0 ? left.charCodeAt(a--) - 48 : 0) +
+      (b >= 0 ? right.charCodeAt(b--) - 48 : 0) +
+      carry;
+    result = String(sum % 10) + result;
+    carry = Math.floor(sum / 10);
+  }
+
+  return normalizeInteger(result);
+}
+
 function toStroops(value: string | number) {
   const normalized = String(value).trim();
   if (!/^\d+(?:\.\d{1,7})?$/.test(normalized)) {
@@ -33,13 +67,13 @@ function toStroops(value: string | number) {
   }
 
   const [whole, fraction = ""] = normalized.split(".");
-  return BigInt(whole) * 10_000_000n + BigInt(fraction.padEnd(7, "0"));
+  return normalizeInteger(`${whole}${fraction.padEnd(7, "0")}`);
 }
 
-function findFarmBalance(account: Horizon.ServerApi.AccountRecord) {
+function findFarmBalance(account: { balances: Horizon.ServerApi.AccountRecord["balances"] }) {
   return account.balances.find(
     (balance) =>
-      balance.asset_type !== "native" &&
+      (balance.asset_type === "credit_alphanum4" || balance.asset_type === "credit_alphanum12") &&
       balance.asset_code === FARM_CODE &&
       balance.asset_issuer === FARM_ISSUER,
   );
@@ -63,9 +97,10 @@ export async function assertDestinationCanReceiveFarm(destination: string, amoun
 
   const amountStroops = toStroops(amount);
   const currentStroops = toStroops(balance.balance);
-  const limitStroops = balance.limit ? toStroops(balance.limit) : 0n;
+  const limitStroops = balance.limit ? toStroops(balance.limit) : "0";
+  const resultingStroops = addIntegers(currentStroops, amountStroops);
 
-  if (currentStroops + amountStroops > limitStroops) {
+  if (compareIntegers(resultingStroops, limitStroops) > 0) {
     throw new Error("Destination wallet's FARM trustline limit is too low");
   }
 }
@@ -107,7 +142,7 @@ export async function submitFarmWithdrawal({
     throw new Error("Distribution account does not hold FARM");
   }
 
-  if (toStroops(sourceFarmBalance.balance) < toStroops(amount)) {
+  if (compareIntegers(toStroops(sourceFarmBalance.balance), toStroops(amount)) < 0) {
     throw new Error("Distribution account does not have enough FARM");
   }
 
