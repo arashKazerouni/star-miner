@@ -71,12 +71,17 @@ function toStroops(value: string | number) {
 }
 
 function findFarmBalance(account: { balances: Horizon.ServerApi.AccountRecord["balances"] }) {
-  return account.balances.find(
-    (balance) =>
+  for (const balance of account.balances) {
+    if (
       (balance.asset_type === "credit_alphanum4" || balance.asset_type === "credit_alphanum12") &&
       balance.asset_code === FARM_CODE &&
-      balance.asset_issuer === FARM_ISSUER,
-  );
+      balance.asset_issuer === FARM_ISSUER
+    ) {
+      return balance;
+    }
+  }
+
+  return undefined;
 }
 
 export async function assertDestinationCanReceiveFarm(destination: string, amount: string) {
