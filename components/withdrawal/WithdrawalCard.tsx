@@ -2,16 +2,19 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { ExternalLink } from "lucide-react";
 import { FarmLogo } from "../FarmLogo";
 
 const STELLAR_PUBLIC_KEY = /^G[A-Z2-7]{55}$/;
-const WITHDRAWALS_ENABLED = false;
+const WALLET_STORAGE_KEY = "stellar-farm-stellar-wallet";
 
 type Withdrawal = {
   id: number;
   amount: number | string;
   wallet_address: string;
   status: "pending" | "processing" | "completed" | "rejected";
+  tx_hash?: string | null;
+  error_message?: string | null;
   created_at: string;
 };
 
@@ -20,43 +23,11 @@ type WithdrawalCardProps = {
   threshold: number;
 };
 
-function ComingSoonState() {
-  return (
-    <section className="rounded-3xl border border-[#292935] bg-[#121217] p-6 sm:p-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <div className="mx-auto flex items-center justify-center mb-[-1rem]">
-          <FarmLogo size={72} />
-        </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-[#9B8AFF]">
-          FARM withdrawals
-        </p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          Coming Soon
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
-          We&apos;re building the next stage of FARM before opening withdrawals.
-          FARM is not listed yet, and we want the ecosystem, liquidity, and
-          utility to be ready before we turn withdrawals on.
-        </p>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
-          Every miner, referral, and active member helps move FARM from an idea
-          into a real ecosystem. Keep building your balance, invite people who
-          believe in the project, and stay with us as we work toward meaningful
-          utility and market access.
-        </p>
-        <div className="mt-7 rounded-2xl border border-[#292935] bg-[#0F0F14] p-4 text-left">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-            Our approach
-          </p>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            We&apos;ll enable withdrawals when FARM has the foundation to
-            support them responsibly. Until then, your mining balance remains
-            visible and your progress stays part of the journey.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
+function statusClass(status: Withdrawal["status"]) {
+  if (status === "completed") return "bg-emerald-500/10 text-emerald-400";
+  if (status === "rejected") return "bg-red-500/10 text-red-400";
+  if (status === "processing") return "bg-amber-500/10 text-amber-300";
+  return "bg-[#1B1730] text-[#B9ACFF]";
 }
 
 export default function WithdrawalCard({
@@ -76,19 +47,22 @@ export default function WithdrawalCard({
     const supabase = createClient();
     const { data } = await supabase
       .from("withdrawals")
-      .select("id, amount, wallet_address, status, created_at")
+      .select(
+        "id, amount, wallet_address, status, tx_hash, error_message, created_at",
+      )
       .order("created_at", { ascending: false })
       .limit(20);
+
     setHistory((data as Withdrawal[] | null) ?? []);
     setHistoryLoading(false);
   }
 
   useEffect(() => {
-    if (WITHDRAWALS_ENABLED) {
-      void loadHistory();
-    } else {
-      setHistoryLoading(false);
+    const storedWallet = localStorage.getItem(WALLET_STORAGE_KEY) ?? "";
+    if (STELLAR_PUBLIC_KEY.test(storedWallet)) {
+      setWallet(storedWallet);
     }
+    void loadHistory();
   }, []);
 
   async function requestWithdrawal(event: FormEvent<HTMLFormElement>) {
@@ -110,28 +84,34 @@ export default function WithdrawalCard({
     }
 
     setLoading(true);
-    const supabase = createClient();
-    const { data, error: requestError } = await supabase.rpc(
-      "request_withdrawal",
-      {
-        wallet_address_input: normalized,
-      },
-    );
 
-    if (requestError) {
-      setError(requestError.message || "Unable to submit withdrawal request.");
-    } else if (data) {
+    try {
+      const response = await fetch("/api/withdraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: normalized }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload?.error || "Unable to submit withdrawal request.");
+      }
+
       setMessage(
-        "Withdrawal request submitted. Your request is now pending review.",
+        `Withdrawal successful: ${Number(payload.withdrawal.amount).toFixed(7)} FARM sent to your Stellar wallet.`,
       );
-      setWallet("");
+      setWallet(normalized);
       await loadHistory();
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to submit withdrawal request.",
+      );
+      await loadHistory();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }
-
-  if (!WITHDRAWALS_ENABLED) {
-    return <ComingSoonState />;
   }
 
   return (
@@ -154,7 +134,7 @@ export default function WithdrawalCard({
         </div>
         <div className="mt-4 flex justify-between text-sm">
           <span className="text-slate-500">Minimum</span>
-          <span className="font-mono">{threshold.toFixed(6)} FARM</span>
+          <span className="font-mono">{threshold.toFixed(0)} FARM</span>
         </div>
       </div>
 
@@ -166,12 +146,10 @@ export default function WithdrawalCard({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
             Request payout
           </p>
-          <h2 className="mt-2 text-xl font-bold">
-            Send FARM to your Stellar wallet
-          </h2>
+          <h2 className="mt-2 text-xl font-bold">Send FARM to your Stellar wallet</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            Your full eligible FARM balance will be reserved for this request.
-            Double-check the destination before submitting.
+            Your eligible FARM is reserved while the payment is processed. The
+            destination must already have a FARM trustline.
           </p>
 
           <label
@@ -190,11 +168,13 @@ export default function WithdrawalCard({
             className="mt-2 w-full rounded-2xl border border-[#292935] bg-[#0F0F14] px-4 py-3.5 font-mono text-sm text-white outline-none transition placeholder:text-slate-700 focus:border-[#6C38FF]"
           />
 
+          {message && (
+            <div className="mt-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-3 text-xs leading-5 text-emerald-300">
+              {message}
+            </div>
+          )}
           {error && (
             <p className="mt-3 text-xs leading-5 text-red-400">{error}</p>
-          )}
-          {message && (
-            <p className="mt-3 text-xs leading-5 text-emerald-400">{message}</p>
           )}
 
           <button
@@ -202,22 +182,14 @@ export default function WithdrawalCard({
             disabled={loading || !wallet}
             className="mt-4 w-full rounded-2xl bg-[#6C38FF] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#5A2EE5] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {loading
-              ? "Submitting request..."
-              : `Request ${balance.toFixed(6)} FARM`}
+            {loading ? "Processing Stellar payment..." : `Withdraw ${balance.toFixed(6)} FARM`}
           </button>
         </form>
       ) : (
         <div className="rounded-2xl border border-[#22222D] bg-[#0F0F14] p-5">
-          <p className="text-sm font-semibold text-slate-300">
-            Withdrawal locked
-          </p>
+          <p className="text-sm font-semibold text-slate-300">Withdrawal locked</p>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            You need{" "}
-            <span className="font-mono text-slate-300">
-              {remaining.toFixed(6)} FARM
-            </span>{" "}
-            more to unlock withdrawals.
+            You need <span className="font-mono text-slate-300">{remaining.toFixed(6)} FARM</span> more to unlock withdrawals.
           </p>
         </div>
       )}
@@ -236,12 +208,8 @@ export default function WithdrawalCard({
         <div className="mt-5 space-y-3">
           {history.length === 0 && !historyLoading ? (
             <div className="rounded-2xl border border-dashed border-[#292935] px-4 py-8 text-center">
-              <p className="text-sm text-slate-400">
-                No withdrawal requests yet.
-              </p>
-              <p className="mt-1 text-xs text-slate-600">
-                Your requests and statuses will appear here.
-              </p>
+              <p className="text-sm text-slate-400">No withdrawal requests yet.</p>
+              <p className="mt-1 text-xs text-slate-600">Your requests and statuses will appear here.</p>
             </div>
           ) : historyLoading ? (
             <div className="rounded-2xl border border-[#292935] px-4 py-8 text-center text-xs text-slate-600">
@@ -249,37 +217,48 @@ export default function WithdrawalCard({
             </div>
           ) : (
             history.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-2xl border border-[#292935] bg-[#0F0F14] p-4"
-              >
+              <div key={item.id} className="rounded-2xl border border-[#292935] bg-[#0F0F14] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-mono text-sm font-semibold">
-                      {Number(item.amount).toFixed(6)} FARM
-                    </p>
-                    <p className="mt-1 text-[11px] text-slate-600">
-                      {new Date(item.created_at).toLocaleString()}
-                    </p>
+                    <p className="font-mono text-sm font-semibold">{Number(item.amount).toFixed(7)} FARM</p>
+                    <p className="mt-1 text-[11px] text-slate-600">{new Date(item.created_at).toLocaleString()}</p>
                   </div>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${
-                      item.status === "completed"
-                        ? "bg-emerald-500/10 text-emerald-400"
-                        : item.status === "rejected"
-                          ? "bg-red-500/10 text-red-400"
-                          : "bg-[#1B1730] text-[#B9ACFF]"
-                    }`}
-                  >
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${statusClass(item.status)}`}>
                     {item.status}
                   </span>
                 </div>
-                <p className="mt-3 truncate font-mono text-[10px] text-slate-600">
-                  {item.wallet_address}
-                </p>
+                <p className="mt-3 truncate font-mono text-[10px] text-slate-600">{item.wallet_address}</p>
+                {item.tx_hash && (
+                  <a
+                    href={`https://stellar.expert/explorer/public/tx/${item.tx_hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#A78BFA] hover:text-white"
+                  >
+                    View Stellar transaction <ExternalLink size={13} />
+                  </a>
+                )}
+                {item.status === "rejected" && item.error_message && (
+                  <p className="mt-2 text-xs leading-5 text-red-400">{item.error_message}</p>
+                )}
               </div>
             ))
           )}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-violet-400/10 bg-violet-400/5 p-4">
+        <div className="flex gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
+            <FarmLogo size={34} />
+          </div>
+          <div>
+            <p className="text-sm font-bold">Secure Stellar withdrawal</p>
+            <p className="mt-1 text-xs leading-5 text-slate-400">
+              Only a public Stellar address is used here. The FARM distribution
+              signing key never reaches the browser.
+            </p>
+          </div>
         </div>
       </div>
     </section>
