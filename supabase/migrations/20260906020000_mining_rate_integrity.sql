@@ -1,9 +1,9 @@
--- Keep the mining rate deterministic: base rate + 20% of base rate per referral.
+-- Keep the mining rate deterministic: 100 FARM/day base rate + 20% of base rate per referral.
 -- This repairs existing profiles and makes sync_mining authoritative so the
 -- dashboard and actual reward calculation always use the same rate.
 
 update public.profiles
-set mining_rate = 0.0000025 + greatest(referrals, 0) * 0.0000005;
+set mining_rate = 4.166666666666667 + greatest(referrals, 0) * 0.8333333333333334;
 
 create or replace function public.claim_referral(referral_code_input text)
 returns boolean
@@ -36,7 +36,7 @@ begin
 
   update public.profiles
   set referrals = referrals + 1,
-      mining_rate = 0.0000025 + (referrals + 1) * 0.0000005
+      mining_rate = 4.166666666666667 + (referrals + 1) * 0.8333333333333334
   where id = inviter;
 
   return true;
@@ -71,7 +71,7 @@ begin
   where id = auth.uid()
   for update;
 
-  effective_rate := 0.0000025 + greatest(profile.referrals, 0) * 0.0000005;
+  effective_rate := 4.166666666666667 + greatest(profile.referrals, 0) * 0.8333333333333334;
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
   reward := effective_rate * (elapsed_seconds / 3600);
 
