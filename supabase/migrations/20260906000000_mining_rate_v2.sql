@@ -1,13 +1,12 @@
--- Mining rate v2: FARM/hour, calibrated for ~16.7 days to reach the
--- current 0.001 FARM withdrawal threshold at the base rate.
+-- Mining rate v2: 100 FARM/day base mining rate.
 -- Referral bonus adds 20% of the base rate per referral.
 
 update public.profiles
-set mining_rate = 0.0000025 + greatest(referrals, 0) * 0.0000005
+set mining_rate = 4.166666666666667 + greatest(referrals, 0) * 0.8333333333333334
 where mining_rate = 0.000001;
 
 alter table public.profiles
-  alter column mining_rate set default 0.0000025;
+  alter column mining_rate set default 4.166666666666667;
 
 create or replace function public.claim_referral(referral_code_input text)
 returns boolean
@@ -40,7 +39,7 @@ begin
 
   update public.profiles
   set referrals = referrals + 1,
-      mining_rate = 0.0000025 + (referrals + 1) * 0.0000005
+      mining_rate = 4.166666666666667 + (referrals + 1) * 0.8333333333333334
   where id = inviter;
 
   return true;
