@@ -1,5 +1,6 @@
--- Raise the canonical FARM mining rate to 100 FARM/day.
--- Referrals keep the existing +0.01 FARM/hour bonus.
+-- Canonical FARM mining rate: 100 FARM/day.
+-- Hourly base rate is 100 / 24 = 4.166666666666667 FARM/hour.
+-- Referrals add 20% of the base rate per successful referral.
 -- Settle accrued rewards at each user's current persisted rate before switching
 -- rates so the new rate does not retroactively apply to old elapsed time.
 
@@ -7,7 +8,7 @@ update public.profiles
 set balance = balance + mining_rate * (
       greatest(extract(epoch from (now() - last_mining_update)), 0) / 3600
     ),
-    mining_rate = 4.166666666666667 + greatest(referrals, 0) * 0.01,
+    mining_rate = 4.166666666666667 + greatest(referrals, 0) * 0.8333333333333334,
     last_mining_update = now();
 
 alter table public.profiles
@@ -44,7 +45,7 @@ begin
 
   update public.profiles
   set referrals = referrals + 1,
-      mining_rate = 4.166666666666667 + (referrals + 1) * 0.01
+      mining_rate = 4.166666666666667 + (referrals + 1) * 0.8333333333333334
   where id = inviter;
 
   return true;
@@ -79,7 +80,7 @@ begin
   where id = auth.uid()
   for update;
 
-  effective_rate := 4.166666666666667 + greatest(profile.referrals, 0) * 0.01;
+  effective_rate := 4.166666666666667 + greatest(profile.referrals, 0) * 0.8333333333333334;
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
   reward := effective_rate * (elapsed_seconds / 3600);
 
