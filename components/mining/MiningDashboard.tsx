@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowDownToLine, ArrowUpRight, LogOut, Users } from "lucide-react";
 import MiningCore from "@/components/mining/MiningCore";
+import StellarWalletConnect from "@/components/wallet/StellarWalletConnect";
 import { useUser } from "@/context/UserContext";
 import { createClient } from "@/lib/supabase/client";
 import { WITHDRAWAL_THRESHOLD } from "@/lib/withdrawal";
@@ -158,6 +159,10 @@ export default function MiningDashboard() {
                 style={{ width: `${progress}%` }}
               />
             </div>
+          </section>
+
+          <section className="mt-4">
+            <StellarWalletConnect />
           </section>
 
           <section className="mt-4 grid gap-4 sm:grid-cols-2">
