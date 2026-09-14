@@ -10,6 +10,7 @@
     "test": "node --test lib/mining.test.mjs lib/farm-price.test.mjs lib/economics.test.mjs"
   },
   "dependencies": {
+    "@creit.tech/stellar-wallets-kit": "^2.6.0",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "lucide-react": "^1.41.0",
