@@ -1,10 +1,10 @@
 -- Approved Star-Miner retention economics:
--- 0.05 FARM/hour base mining rate.
--- 0.01 FARM/hour referral bonus per successful referral.
+-- 4.1666666667 FARM/hour base mining rate (~100 FARM/day).
+-- 0.8333333333 FARM/hour referral bonus per successful referral (20% of base).
 -- 10 FARM minimum withdrawal threshold.
 
 update public.profiles
-set mining_rate = 0.05 + greatest(referrals, 0) * 0.01;
+set mining_rate = 4.166666666666667 + greatest(referrals, 0) * 0.8333333333333334;
 
 create or replace function public.claim_referral(referral_code_input text)
 returns boolean
@@ -37,7 +37,7 @@ begin
 
   update public.profiles
   set referrals = referrals + 1,
-      mining_rate = 0.05 + (referrals + 1) * 0.01
+      mining_rate = 4.166666666666667 + (referrals + 1) * 0.8333333333333334
   where id = inviter;
 
   return true;
@@ -72,7 +72,7 @@ begin
   where id = auth.uid()
   for update;
 
-  effective_rate := 0.05 + greatest(profile.referrals, 0) * 0.01;
+  effective_rate := 4.166666666666667 + greatest(profile.referrals, 0) * 0.8333333333333334;
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
   reward := effective_rate * (elapsed_seconds / 3600);
 
