@@ -2,7 +2,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   balance numeric(30,18) not null default 0.000013,
   referrals integer not null default 0,
-  mining_rate numeric(30,18) not null default 0.000001,
+  mining_rate numeric(30,18) not null default 4.166666666666667,
   last_mining_update timestamptz not null default now(),
   referral_code text not null unique default upper(substr(md5(gen_random_uuid()::text), 1, 8)),
   created_at timestamptz not null default now()
@@ -77,7 +77,7 @@ begin
 
   update public.profiles
   set referrals = referrals + 1,
-      mining_rate = 0.000001 + (referrals + 1) * 0.000001
+      mining_rate = 4.166666666666667 + (referrals + 1) * 0.8333333333333334
   where id = inviter;
 
   return true;
@@ -112,7 +112,7 @@ begin
   for update;
 
   elapsed_seconds := greatest(extract(epoch from (now() - profile.last_mining_update)), 0);
-  reward := profile.mining_rate * (elapsed_seconds / 60);
+  reward := profile.mining_rate * (elapsed_seconds / 3600);
 
   update public.profiles
   set balance = profile.balance + reward,
