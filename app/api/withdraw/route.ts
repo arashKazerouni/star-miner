@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import {
-  assertDestinationCanReceiveFarm,
+  findExistingWithdrawalSettlement,
   submitFarmWithdrawal,
 } from "@/lib/stellar/farm-withdrawal";
 
@@ -47,8 +47,6 @@ export async function POST(request: Request) {
   let withdrawalId: number | null = null;
 
   try {
-    await assertDestinationCanReceiveFarm(walletAddress, "0.0000001");
-
     const { data: requested, error: requestError } = await supabase.rpc(
       "request_withdrawal",
       { wallet_address_input: walletAddress },
@@ -74,7 +72,7 @@ export async function POST(request: Request) {
       ? processing[0]
       : processing;
 
-    const txHash = await submitFarmWithdrawal({
+    const settlement = await submitFarmWithdrawal({
       withdrawalId,
       destination: processingWithdrawal.wallet_address,
       amount: String(processingWithdrawal.amount),
@@ -84,32 +82,35 @@ export async function POST(request: Request) {
       "complete_withdrawal",
       {
         withdrawal_id_input: withdrawalId,
-        tx_hash_input: txHash,
+        tx_hash_input: settlement.txHash,
+        claimable_balance_id_input: settlement.claimableBalanceId,
       },
     );
 
     if (completeError || !completed) {
-      throw new Error(completeError?.message ?? "Payment submitted but status could not be finalized");
+      throw new Error(
+        completeError?.message ?? "Payment submitted but status could not be finalized",
+      );
     }
 
     const result = Array.isArray(completed) ? completed[0] : completed;
     return NextResponse.json({
       success: true,
       withdrawal: result,
-      txHash,
+      txHash: settlement.txHash,
+      claimableBalanceId: settlement.claimableBalanceId,
+      settlementType: settlement.claimableBalanceId ? "claimable_balance" : "payment",
     });
   } catch (error) {
     if (withdrawalId) {
       try {
-        const { findExistingWithdrawalTransaction } = await import(
-          "@/lib/stellar/farm-withdrawal"
-        );
-        const existingHash = await findExistingWithdrawalTransaction(withdrawalId);
+        const existing = await findExistingWithdrawalSettlement(withdrawalId);
 
-        if (existingHash) {
+        if (existing) {
           const { data: completed } = await supabase.rpc("complete_withdrawal", {
             withdrawal_id_input: withdrawalId,
-            tx_hash_input: existingHash,
+            tx_hash_input: existing.txHash,
+            claimable_balance_id_input: existing.claimableBalanceId,
           });
 
           if (completed) {
@@ -117,7 +118,9 @@ export async function POST(request: Request) {
             return NextResponse.json({
               success: true,
               withdrawal: result,
-              txHash: existingHash,
+              txHash: existing.txHash,
+              claimableBalanceId: existing.claimableBalanceId,
+              settlementType: existing.claimableBalanceId ? "claimable_balance" : "payment",
             });
           }
         }
