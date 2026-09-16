@@ -8,6 +8,7 @@ import {
   Networks,
   Operation,
   StrKey,
+  Transaction,
   TransactionBuilder,
 } from "@stellar/stellar-sdk";
 import { getWithdrawalSettlementMode } from "../withdrawal-settlement-mode.mjs";
@@ -122,7 +123,9 @@ export async function assertDestinationCanReceiveFarm(destination: string, amoun
 function getClaimableBalanceId(transaction: Horizon.ServerApi.TransactionRecord) {
   try {
     const parsed = TransactionBuilder.fromXdr(transaction.envelope_xdr, Networks.PUBLIC);
-    const operation = parsed.operations()[0];
+    if (!(parsed instanceof Transaction)) return null;
+
+    const operation = parsed.operations[0];
     if (operation?.type !== "createClaimableBalance") return null;
     return parsed.getClaimableBalanceId(0);
   } catch {
