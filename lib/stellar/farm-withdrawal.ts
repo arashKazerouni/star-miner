@@ -13,7 +13,7 @@ import {
 import { getWithdrawalSettlementMode } from "../withdrawal-settlement-mode.mjs";
 
 export const FARM_CODE = "FARM";
-export const FARM_ISSUER = "GBF7ZMNV4L2PFQRHJEMQLH7FEYMIPY5P234C2NMNB";
+export const FARM_ISSUER = "GBF7ZMNV4L2PFQRHJEMQLH7FEYMIP4ZSUKQ42ZOCYL5MI5P234C2NMNB";
 export const HORIZON_URL = "https://horizon.stellar.org";
 
 const server = new Horizon.Server(HORIZON_URL);
