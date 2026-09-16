@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test lib/mining.test.mjs lib/farm-price.test.mjs lib/economics.test.mjs"
+    "test": "node --test lib/mining.test.mjs lib/farm-price.test.mjs lib/economics.test.mjs lib/withdrawal-settlement-mode.test.mjs"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^2.6.0",
