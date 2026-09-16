@@ -14,6 +14,7 @@ type Withdrawal = {
   wallet_address: string;
   status: "pending" | "processing" | "completed" | "rejected";
   tx_hash?: string | null;
+  claimable_balance_id?: string | null;
   error_message?: string | null;
   created_at: string;
 };
@@ -23,11 +24,17 @@ type WithdrawalCardProps = {
   threshold: number;
 };
 
-function statusClass(status: Withdrawal["status"]) {
+function statusClass(status: Withdrawal["status"], claimableBalanceId?: string | null) {
+  if (claimableBalanceId) return "bg-violet-500/10 text-violet-300";
   if (status === "completed") return "bg-emerald-500/10 text-emerald-400";
   if (status === "rejected") return "bg-red-500/10 text-red-400";
   if (status === "processing") return "bg-amber-500/10 text-amber-300";
   return "bg-[#1B1730] text-[#B9ACFF]";
+}
+
+function displayStatus(item: Withdrawal) {
+  if (item.claimable_balance_id) return "claimable";
+  return item.status;
 }
 
 export default function WithdrawalCard({
@@ -48,7 +55,7 @@ export default function WithdrawalCard({
     const { data } = await supabase
       .from("withdrawals")
       .select(
-        "id, amount, wallet_address, status, tx_hash, error_message, created_at",
+        "id, amount, wallet_address, status, tx_hash, claimable_balance_id, error_message, created_at",
       )
       .order("created_at", { ascending: false })
       .limit(20);
@@ -97,9 +104,15 @@ export default function WithdrawalCard({
         throw new Error(payload?.error || "Unable to submit withdrawal request.");
       }
 
-      setMessage(
-        `Withdrawal successful: ${Number(payload.withdrawal.amount).toFixed(7)} FARM sent to your Stellar wallet.`,
-      );
+      if (payload.claimableBalanceId) {
+        setMessage(
+          `Withdrawal created: ${Number(payload.withdrawal.amount).toFixed(7)} FARM is waiting in a claimable balance. Add the FARM trustline to your Stellar wallet, then claim the balance.`,
+        );
+      } else {
+        setMessage(
+          `Withdrawal successful: ${Number(payload.withdrawal.amount).toFixed(7)} FARM sent to your Stellar wallet.`,
+        );
+      }
       setWallet(normalized);
       await loadHistory();
     } catch (requestError) {
@@ -148,8 +161,7 @@ export default function WithdrawalCard({
           </p>
           <h2 className="mt-2 text-xl font-bold">Send FARM to your Stellar wallet</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            Your eligible FARM is reserved while the payment is processed. The
-            destination must already have a FARM trustline.
+            If the destination already has a FARM trustline, FARM is sent directly. Otherwise, the payout is placed in a claimable balance until the trustline is added.
           </p>
 
           <label
@@ -223,11 +235,28 @@ export default function WithdrawalCard({
                     <p className="font-mono text-sm font-semibold">{Number(item.amount).toFixed(7)} FARM</p>
                     <p className="mt-1 text-[11px] text-slate-600">{new Date(item.created_at).toLocaleString()}</p>
                   </div>
-                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${statusClass(item.status)}`}>
-                    {item.status}
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${statusClass(item.status, item.claimable_balance_id)}`}>
+                    {displayStatus(item)}
                   </span>
                 </div>
                 <p className="mt-3 truncate font-mono text-[10px] text-slate-600">{item.wallet_address}</p>
+                {item.claimable_balance_id && (
+                  <div className="mt-3 rounded-xl border border-violet-400/10 bg-violet-400/5 p-3">
+                    <p className="text-[11px] font-semibold text-violet-200">FARM is waiting to be claimed</p>
+                    <p className="mt-1 break-all font-mono text-[10px] text-slate-500">{item.claimable_balance_id}</p>
+                    <p className="mt-2 text-[11px] leading-5 text-slate-400">
+                      Add the FARM trustline to the destination wallet, then claim this balance.
+                    </p>
+                    <a
+                      href={`https://horizon.stellar.org/claimable_balances/${item.claimable_balance_id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#A78BFA] hover:text-white"
+                    >
+                      View claimable balance <ExternalLink size={13} />
+                    </a>
+                  </div>
+                )}
                 {item.tx_hash && (
                   <a
                     href={`https://stellar.expert/explorer/public/tx/${item.tx_hash}`}
