@@ -1,6 +1,7 @@
 import {
   Asset,
   BASE_FEE,
+  Claimant,
   Horizon,
   Keypair,
   Memo,
@@ -9,6 +10,7 @@ import {
   StrKey,
   TransactionBuilder,
 } from "@stellar/stellar-sdk";
+import { getWithdrawalSettlementMode } from "../withdrawal-settlement-mode.mjs";
 
 export const FARM_CODE = "FARM";
 export const FARM_ISSUER = "GBF7ZMNV4L2PFQRHJEMQLH7FEYMIP4ZSUKQ42ZOCYL5MI5P234C2NMNB";
@@ -84,17 +86,24 @@ function findFarmBalance(account: { balances: Horizon.ServerApi.AccountRecord["b
   return undefined;
 }
 
+async function loadDestinationFarmBalance(destination: string) {
+  try {
+    const account = await server.loadAccount(destination);
+    return findFarmBalance(account);
+  } catch (error) {
+    const status = (error as { response?: { status?: number } })?.response?.status;
+    if (status === 404) return undefined;
+    throw error;
+  }
+}
+
 export async function assertDestinationCanReceiveFarm(destination: string, amount: string) {
   if (!StrKey.isValidEd25519PublicKey(destination)) {
     throw new Error("Invalid Stellar wallet address");
   }
 
-  const account = await server.loadAccount(destination);
-  const balance = findFarmBalance(account);
-
-  if (!balance) {
-    throw new Error("Destination wallet does not have a FARM trustline");
-  }
+  const balance = await loadDestinationFarmBalance(destination);
+  if (!balance) return;
 
   if (balance.is_authorized === false) {
     throw new Error("Destination wallet's FARM trustline is not authorized");
@@ -110,7 +119,16 @@ export async function assertDestinationCanReceiveFarm(destination: string, amoun
   }
 }
 
-export async function findExistingWithdrawalTransaction(withdrawalId: number) {
+function getClaimableBalanceId(transaction: Horizon.ServerApi.TransactionRecord) {
+  try {
+    const parsed = TransactionBuilder.fromXDR(transaction.envelope_xdr, Networks.PUBLIC);
+    return parsed.getClaimableBalanceId(0);
+  } catch {
+    return null;
+  }
+}
+
+export async function findExistingWithdrawalSettlement(withdrawalId: number) {
   const distribution = getDistributionKeypair();
   const memo = `WD:${withdrawalId}`;
   const response = await server
@@ -120,7 +138,17 @@ export async function findExistingWithdrawalTransaction(withdrawalId: number) {
     .limit(50)
     .call();
 
-  return response.records.find((transaction) => transaction.memo === memo)?.hash ?? null;
+  const transaction = response.records.find((record) => record.memo === memo);
+  if (!transaction) return null;
+
+  return {
+    txHash: transaction.hash,
+    claimableBalanceId: getClaimableBalanceId(transaction),
+  };
+}
+
+export async function findExistingWithdrawalTransaction(withdrawalId: number) {
+  return (await findExistingWithdrawalSettlement(withdrawalId))?.txHash ?? null;
 }
 
 export async function submitFarmWithdrawal({
@@ -132,12 +160,32 @@ export async function submitFarmWithdrawal({
   destination: string;
   amount: string;
 }) {
-  const existingHash = await findExistingWithdrawalTransaction(withdrawalId);
-  if (existingHash) {
-    return existingHash;
+  const existing = await findExistingWithdrawalSettlement(withdrawalId);
+  if (existing) return existing;
+
+  if (!StrKey.isValidEd25519PublicKey(destination)) {
+    throw new Error("Invalid Stellar wallet address");
   }
 
-  await assertDestinationCanReceiveFarm(destination, amount);
+  const destinationFarmBalance = await loadDestinationFarmBalance(destination);
+  const settlementMode = getWithdrawalSettlementMode(Boolean(destinationFarmBalance));
+
+  if (destinationFarmBalance?.is_authorized === false) {
+    throw new Error("Destination wallet's FARM trustline is not authorized");
+  }
+
+  if (destinationFarmBalance) {
+    const amountStroops = toStroops(amount);
+    const currentStroops = toStroops(destinationFarmBalance.balance);
+    const limitStroops = destinationFarmBalance.limit
+      ? toStroops(destinationFarmBalance.limit)
+      : "0";
+    const resultingStroops = addIntegers(currentStroops, amountStroops);
+
+    if (compareIntegers(resultingStroops, limitStroops) > 0) {
+      throw new Error("Destination wallet's FARM trustline limit is too low");
+    }
+  }
 
   const distribution = getDistributionKeypair();
   const sourceAccount = await server.loadAccount(distribution.publicKey());
@@ -151,22 +199,36 @@ export async function submitFarmWithdrawal({
     throw new Error("Distribution account does not have enough FARM");
   }
 
+  const operation =
+    settlementMode === "payment"
+      ? Operation.payment({
+          destination,
+          asset: farmAsset,
+          amount,
+        })
+      : Operation.createClaimableBalance({
+          asset: farmAsset,
+          amount,
+          claimants: [new Claimant(destination, Claimant.predicateUnconditional())],
+        });
+
   const transaction = new TransactionBuilder(sourceAccount, {
     fee: BASE_FEE,
     networkPassphrase: Networks.PUBLIC,
   })
-    .addOperation(
-      Operation.payment({
-        destination,
-        asset: farmAsset,
-        amount,
-      }),
-    )
+    .addOperation(operation)
     .addMemo(Memo.text(`WD:${withdrawalId}`))
     .setTimeout(60)
     .build();
 
+  const claimableBalanceId =
+    settlementMode === "claimable_balance" ? transaction.getClaimableBalanceId(0) : null;
+
   transaction.sign(distribution);
   const response = await server.submitTransaction(transaction);
-  return response.hash;
+
+  return {
+    txHash: response.hash,
+    claimableBalanceId,
+  };
 }
