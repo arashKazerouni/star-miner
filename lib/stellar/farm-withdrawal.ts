@@ -121,7 +121,7 @@ export async function assertDestinationCanReceiveFarm(destination: string, amoun
 
 function getClaimableBalanceId(transaction: Horizon.ServerApi.TransactionRecord) {
   try {
-    const parsed = TransactionBuilder.fromXDR(transaction.envelope_xdr, Networks.PUBLIC);
+    const parsed = TransactionBuilder.fromXdr(transaction.envelope_xdr, Networks.PUBLIC);
     return parsed.getClaimableBalanceId(0);
   } catch {
     return null;
